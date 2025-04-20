@@ -1,0 +1,161 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Blood Donation Campaigns</h1>
+            <% if (currentUser.role !== 'admin') { %>
+                <p class="lead">Find and participate in blood donation campaigns to help save lives.</p>
+            <% } %>
+        </div>
+        <% if (currentUser.role === 'admin') { %>
+        <div class="col-md-4 text-right">
+            <div class="btn-group">
+                <a href="/campaigns/upcoming/new" class="btn btn-success">
+                    <i class="fas fa-calendar-plus mr-1"></i> Add Upcoming Campaign
+                </a>
+                <a href="/campaigns/completed/new" class="btn btn-info">
+                    <i class="fas fa-calendar-check mr-1"></i> Add Completed Campaign
+                </a>
+            </div>
+        </div>
+        <% } %>
+    </div>
+    
+    <!-- Ongoing Campaigns Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-heartbeat mr-2"></i> Ongoing Campaigns
+                <span class="badge badge-light ml-2"><%= ongoingCampaigns.length %></span>
+            </h4>
+        </div>
+        <div class="card-body">
+            <% if (ongoingCampaigns.length > 0) { %>
+                <div class="row">
+                    <% ongoingCampaigns.forEach(campaign => { %>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 campaign-card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><%= campaign.name %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Location:</strong> <%= campaign.location %></p>
+                                    <p><strong>Dates:</strong> <%= new Date(campaign.start_date).toLocaleDateString() %> - <%= new Date(campaign.end_date).toLocaleDateString() %></p>
+                                    <p><strong>Organizer:</strong> <%= campaign.organizer %></p>
+                                    <% if (campaign.description) { %>
+                                        <p class="card-text"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                                    <% } %>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/campaigns/<%= campaign.campaign_id %>" class="btn btn-outline-success btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> There are no ongoing campaigns at the moment.
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Upcoming Campaigns Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-calendar-alt mr-2"></i> Upcoming Campaigns
+                <span class="badge badge-light ml-2"><%= upcomingCampaigns.length %></span>
+            </h4>
+        </div>
+        <div class="card-body">
+            <% if (upcomingCampaigns.length > 0) { %>
+                <div class="row">
+                    <% upcomingCampaigns.forEach(campaign => { %>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 campaign-card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0"><%= campaign.name %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Location:</strong> <%= campaign.location %></p>
+                                    <p><strong>Dates:</strong> <%= new Date(campaign.start_date).toLocaleDateString() %> - <%= new Date(campaign.end_date).toLocaleDateString() %></p>
+                                    <p><strong>Organizer:</strong> <%= campaign.organizer %></p>
+                                    <% if (campaign.description) { %>
+                                        <p class="card-text"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                                    <% } %>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/campaigns/<%= campaign.campaign_id %>" class="btn btn-outline-primary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> There are no upcoming campaigns at the moment.
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Completed Campaigns Section -->
+    <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-check-circle mr-2"></i> Completed Campaigns
+                <span class="badge badge-light ml-2"><%= completedCampaigns.length %></span>
+            </h4>
+        </div>
+        <div class="card-body">
+            <% if (completedCampaigns.length > 0) { %>
+                <div class="row">
+                    <% completedCampaigns.slice(0, 6).forEach(campaign => { %>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 campaign-card">
+                                <div class="card-header bg-secondary text-white">
+                                    <h5 class="mb-0"><%= campaign.name %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Location:</strong> <%= campaign.location %></p>
+                                    <p><strong>Dates:</strong> <%= new Date(campaign.start_date).toLocaleDateString() %> - <%= new Date(campaign.end_date).toLocaleDateString() %></p>
+                                    <p><strong>Organizer:</strong> <%= campaign.organizer %></p>
+                                    <% if (campaign.amount_collected) { %>
+                                        <p><strong>Blood Collected:</strong> <%= campaign.amount_collected %> ml</p>
+                                    <% } %>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/campaigns/<%= campaign.campaign_id %>" class="btn btn-outline-secondary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+                <% if (completedCampaigns.length > 6) { %>
+                    <div class="text-center mt-3">
+                        <a href="/campaigns/completed" class="btn btn-outline-secondary">View All Completed Campaigns</a>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> There are no completed campaigns yet.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<style>
+.campaign-card {
+    transition: transform 0.3s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.campaign-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+</style> 

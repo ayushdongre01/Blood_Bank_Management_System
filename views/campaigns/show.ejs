@@ -1,0 +1,212 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/campaigns" class="text-dark" style="text-decoration: none;">Campaigns</a></li>
+                    <li class="breadcrumb-item active"><%= campaign.name %></li>
+                </ol>
+            </nav>
+            <h1 class="mb-3"><%= campaign.name %></h1>
+            <div class="mb-3">
+                <% if (status === 'upcoming') { %>
+                    <span class="badge bg-primary text-white">Upcoming</span>
+                <% } else if (status === 'active') { %>
+                    <span class="badge bg-success text-white">Active</span>
+                <% } else if (status === 'completed') { %>
+                    <span class="badge bg-secondary text-white">Completed</span>
+                <% } else if (status === 'ended') { %>
+                    <span class="badge bg-warning text-white">Ended</span>
+                <% } else if (status === 'cancelled') { %>
+                    <span class="badge bg-danger text-white">Cancelled</span>
+                <% } %>
+            </div>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="/campaigns" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> Back to All Campaigns
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Campaign Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="mb-1 text-muted">Location</p>
+                            <p class="font-weight-bold"><%= campaign.location %></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1 text-muted">Start Date</p>
+                            <p class="font-weight-bold"><%= new Date(campaign.start_date).toLocaleDateString() %></p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="mb-1 text-muted">End Date</p>
+                            <p class="font-weight-bold"><%= new Date(campaign.end_date).toLocaleDateString() %></p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="mb-1 text-muted">Organizer</p>
+                            <p class="font-weight-bold"><%= campaign.organizer %></p>
+                        </div>
+                        <% if (campaign.contact_info) { %>
+                        <div class="col-md-8">
+                            <p class="mb-1 text-muted">Contact Information</p>
+                            <p class="font-weight-bold"><%= campaign.contact_info %></p>
+                        </div>
+                        <% } %>
+                    </div>
+                    
+                    <% if (campaign.description) { %>
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <p><%= campaign.description %></p>
+                    </div>
+                    <% } %>
+                    
+                    <% if (status === 'completed' && campaign.amount_collected) { %>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5>Blood Collected</h5>
+                                    <h3 class="text-success"><%= campaign.amount_collected %> units</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <% if (campaign.donors_participated) { %>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5>Donors Participated</h5>
+                                    <h3 class="text-primary"><%= campaign.donors_participated %></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } %>
+                    
+                    <% if (campaign.notes) { %>
+                    <div class="mt-4">
+                        <h5>Additional Notes</h5>
+                        <p><%= campaign.notes %></p>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <% if (status === 'upcoming' || status === 'active') { %>
+                        <div class="d-grid gap-2">
+                            <% if (currentUser && (currentUser.role === 'donor')) { %>
+                            <a href="#" class="btn btn-success btn-block mb-2">
+                                <i class="fas fa-hand-holding-heart mr-1"></i> Register to Donate
+                            </a>
+                            <% } %>
+                            <a href="#" class="btn btn-outline-primary btn-block mb-2">
+                                <i class="fas fa-share-alt mr-1"></i> Share Campaign
+                            </a>
+                        </div>
+                    <% } else if (status === 'completed') { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle mr-2"></i> This campaign has been completed. Thank you to all donors who participated!
+                        </div>
+                    <% } else if (status === 'ended') { %>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-circle mr-2"></i> This campaign has ended but hasn't been officially marked as completed yet.
+                        </div>
+                        <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff' || currentUser.role === 'hospital_staff')) { %>
+                            <a href="/campaigns/completed/new" class="btn btn-info btn-block mt-2">
+                                <i class="fas fa-check-circle mr-1"></i> Mark as Completed
+                            </a>
+                        <% } %>
+                    <% } else if (status === 'cancelled') { %>
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle mr-2"></i> This campaign has been cancelled.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <% if (status === 'upcoming') { %>
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Campaign Countdown</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div id="countdown" data-startdate="<%= campaign.start_date %>">
+                        <div class="row">
+                            <div class="col-3">
+                                <h3 id="days">--</h3>
+                                <p>Days</p>
+                            </div>
+                            <div class="col-3">
+                                <h3 id="hours">--</h3>
+                                <p>Hours</p>
+                            </div>
+                            <div class="col-3">
+                                <h3 id="minutes">--</h3>
+                                <p>Minutes</p>
+                            </div>
+                            <div class="col-3">
+                                <h3 id="seconds">--</h3>
+                                <p>Seconds</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+// Countdown Timer for Upcoming Campaigns
+if (document.getElementById('countdown')) {
+    function updateCountdown() {
+        const startDateStr = document.getElementById('countdown').dataset.startdate;
+        const startDate = new Date(startDateStr);
+        const now = new Date();
+        
+        const diff = startDate - now;
+        
+        if (diff <= 0) {
+            document.getElementById('days').textContent = '0';
+            document.getElementById('hours').textContent = '0';
+            document.getElementById('minutes').textContent = '0';
+            document.getElementById('seconds').textContent = '0';
+            return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        document.getElementById('days').textContent = days;
+        document.getElementById('hours').textContent = hours;
+        document.getElementById('minutes').textContent = minutes;
+        document.getElementById('seconds').textContent = seconds;
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+</script> 

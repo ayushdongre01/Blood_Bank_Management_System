@@ -1,0 +1,355 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>User Management</h1>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Users</h6>
+        </div>
+        <div class="card-body">
+            <form action="/admin/users" method="GET" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="searchTerm">Search</label>
+                    <input type="text" class="form-control" id="searchTerm" name="searchTerm" placeholder="Username, Email, etc." value="<%= filter && filter.searchTerm ? filter.searchTerm : '' %>">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="role">Role</label>
+                    <select class="form-control" id="role" name="role">
+                        <option value="">All</option>
+                        <option value="admin" <%= filter && filter.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                        <option value="staff" <%= filter && filter.role === 'staff' ? 'selected' : '' %>>Staff</option>
+                        <option value="donor" <%= filter && filter.role === 'donor' ? 'selected' : '' %>>Donor</option>
+                        <option value="hospital" <%= filter && filter.role === 'hospital' ? 'selected' : '' %>>Hospital</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">All</option>
+                        <option value="active" <%= filter && filter.status === 'active' ? 'selected' : '' %>>Active</option>
+                        <option value="inactive" <%= filter && filter.status === 'inactive' ? 'selected' : '' %>>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="sortBy">Sort By</label>
+                    <select class="form-control" id="sortBy" name="sortBy">
+                        <option value="username" <%= filter && filter.sortBy === 'username' ? 'selected' : '' %>>Username</option>
+                        <option value="created_at" <%= filter && filter.sortBy === 'created_at' ? 'selected' : '' %>>Creation Date</option>
+                        <option value="last_login" <%= filter && filter.sortBy === 'last_login' ? 'selected' : '' %>>Last Login</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="/admin/users" class="btn btn-secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Users</h6>
+            <a href="/admin/staff/add" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Staff User
+            </a>
+        </div>
+        <div class="card-body">
+            <% if (users.length === 0) { %>
+                <p class="text-center">No users found.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr>
+                                    <td><%= user.user_id %></td>
+                                    <td><%= user.username %></td>
+                                    <td><%= user.email %></td>
+                                    <td>
+                                        <span class="badge badge-<%= 
+                                            user.role === 'admin' ? 'danger' : 
+                                            (user.role === 'staff' ? 'warning' : 
+                                            (user.role === 'donor' ? 'success' : 'info')) 
+                                        %>">
+                                            <%= user.role.toUpperCase() %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input user-status-toggle" 
+                                                id="statusToggle<%= user.user_id %>" 
+                                                data-user-id="<%= user.user_id %>" 
+                                                <%= user.is_active ? 'checked' : '' %>
+                                                <%= user.role === 'admin' && currentUser.user_id !== user.user_id ? 'disabled' : '' %>>
+                                            <label class="custom-control-label" for="statusToggle<%= user.user_id %>">
+                                                <span class="badge badge-<%= user.is_active ? 'success' : 'secondary' %>">
+                                                    <%= user.is_active ? 'Active' : 'Inactive' %>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td><%= new Date(user.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <% if (user.last_login) { %>
+                                            <%= new Date(user.last_login).toLocaleString() %>
+                                        <% } else { %>
+                                            <span class="text-muted">Never</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <% if (user.role === 'donor') { %>
+                                                <a href="/admin/donors/<%= user.user_id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            <% } else if (user.role === 'hospital') { %>
+                                                <a href="/admin/hospitals/<%= user.user_id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            <% } else if (user.role === 'staff') { %>
+                                                <a href="/admin/staff/<%= user.user_id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/admin/staff/<%= user.user_id %>/edit" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            <% } %>
+                                            
+                                            <% if (currentUser.user_id !== user.user_id && user.role !== 'admin') { %>
+                                                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteModal<%= user.user_id %>">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Delete Modal -->
+                                <% if (currentUser.user_id !== user.user_id && user.role !== 'admin') { %>
+                                    <div class="modal fade" id="deleteModal<%= user.user_id %>" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel<%= user.user_id %>" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="deleteModalLabel<%= user.user_id %>">Confirm Deletion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to delete user <strong><%= user.username %></strong>?</p>
+                                                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone and will delete all associated data.</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                    <form action="/admin/users/<%= user.user_id %>?_method=DELETE" method="POST">
+                                                        <button type="submit" class="btn btn-danger">Delete User</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/users?page=<%= currentPage - 1 %><%= filterQueryString %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="/admin/users?page=<%= i %><%= filterQueryString %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="/admin/users?page=<%= currentPage + 1 %><%= filterQueryString %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- User Stats -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">User Roles Distribution</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height:300px;">
+                        <canvas id="userRolesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">User Registration Trend</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height:300px;">
+                        <canvas id="userRegistrationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle user status
+document.addEventListener('DOMContentLoaded', function() {
+    const statusToggles = document.querySelectorAll('.user-status-toggle');
+    statusToggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const userId = this.getAttribute('data-user-id');
+            fetch(`/admin/users/${userId}/status?_method=PUT`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    is_active: this.checked
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update label
+                    const label = this.nextElementSibling.querySelector('.badge');
+                    if (this.checked) {
+                        label.className = 'badge badge-success';
+                        label.textContent = 'Active';
+                    } else {
+                        label.className = 'badge badge-secondary';
+                        label.textContent = 'Inactive';
+                    }
+                    
+                    // Show success notification
+                    toastr.success(data.message);
+                } else {
+                    // Reset toggle state if failed
+                    this.checked = !this.checked;
+                    toastr.error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Reset toggle state if error
+                this.checked = !this.checked;
+                toastr.error('An error occurred while updating the status.');
+            });
+        });
+    });
+    
+    // Create user roles chart
+    <% if (users.length > 0) { %>
+        const roleData = {
+            admin: 0,
+            staff: 0,
+            donor: 0,
+            hospital: 0
+        };
+        
+        <% users.forEach(user => { %>
+            roleData["<%= user.role %>"]++;
+        <% }); %>
+        
+        const roleCtx = document.getElementById('userRolesChart').getContext('2d');
+        new Chart(roleCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Admin', 'Staff', 'Donor', 'Hospital'],
+                datasets: [{
+                    data: [roleData.admin, roleData.staff, roleData.donor, roleData.hospital],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(54, 162, 235, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)',
+                        'rgb(75, 192, 192)',
+                        'rgb(54, 162, 235)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            }
+        });
+        
+        // Create registration trend chart (simplified example)
+        // In a real app, you would calculate this data in the backend and pass it to the template
+        // This is just a placeholder to demonstrate the chart
+        const registrationCtx = document.getElementById('userRegistrationChart').getContext('2d');
+        new Chart(registrationCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'New Users',
+                    data: [5, 10, 15, 8, 12, 20],
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    <% } %>
+});
+</script> 

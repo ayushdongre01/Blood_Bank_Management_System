@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Management System | <%= title %></title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- Additional stylesheets -->
+    <% if (typeof stylesheets !== 'undefined') { %>
+        <% stylesheets.forEach(function(stylesheet) { %>
+            <link rel="stylesheet" href="<%= stylesheet %>">
+        <% }); %>
+    <% } %>
+</head>
+<!-- The 'body' element is given classes 'd-flex'(display-flex) and 'flex-column' to create a flex container that arranges its 
+ children (the navbar and main content) in a vertical column. 'vh-100' ensures that the body takes up the full height 
+ of the viewport. -->
+<body class="d-flex flex-column vh-100">
+    <!-- The 'navbar' is being included as a partial template. This allows for reuse of the navigation bar 
+     across different pages. -->
+    <% if (typeof hideNavbar === 'undefined' || !hideNavbar) { %>
+        <%- include('../partials/navbar') %>
+    <% } %>
+        <!-- The 'main' element contains the main content of the page. The 'container' class provides a responsive 
+         fixed-width container, and 'mt-5' adds a margin-top to the content. -->
+        <main class="container my-4">
+            <%- include('../partials/flash') %>
+    <!-- The 'body' placeholder will be populated dynamically with content passed from the server (via template rendering). -->
+            <%- body %>
+        </main>
+    <% if (typeof hideFooter === 'undefined' || !hideFooter) { %>
+        <%- include('../partials/footer') %>
+    <% } %>
+    <!--Bootstrap JS Bundle with Popper-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!--jQuery-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Common scripts-->
+    <script src="/js/common.js"></script>
+    
+    <!--Additional scripts-->
+    <% if (typeof scripts !== 'undefined') { %>
+        <% scripts.forEach(function(script) { %>
+            <script src="<%= script %>"></script>
+        <% }); %>
+    <% } %>
+</body>
+
+</html>

@@ -1,0 +1,337 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Blood Request #<%= request.request_id %></h1>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="/hospitals/requests" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Requests
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Request Details Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">Request Details</h6>
+                    <span class="badge badge-<%= 
+                        request.status === 'pending' ? 'warning' : 
+                        (request.status === 'approved' ? 'success' : 
+                        (request.status === 'fulfilled' ? 'primary' : 
+                        (request.status === 'rejected' ? 'danger' : 'secondary'))) 
+                    %>">
+                        <%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Blood Type:</strong> <%= request.blood_type %></p>
+                            <p><strong>Units Requested:</strong> <%= request.units %></p>
+                            <p><strong>Priority:</strong> 
+                                <span class="badge badge-<%= 
+                                    request.priority === 'Emergency' ? 'danger' : 
+                                    (request.priority === 'Urgent' ? 'warning' : 
+                                    (request.priority === 'High' ? 'primary' : 'info'))
+                                %>">
+                                    <%= request.priority %>
+                                </span>
+                            </p>
+                            <p><strong>Reason:</strong> <%= request.reason %></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Request Date:</strong> <%= new Date(request.request_date).toLocaleDateString() %></p>
+                            <p><strong>Required By:</strong> <%= new Date(request.required_date).toLocaleDateString() %></p>
+                            <% if (request.fulfilled_date) { %>
+                                <p><strong>Fulfilled Date:</strong> <%= new Date(request.fulfilled_date).toLocaleDateString() %></p>
+                            <% } %>
+                            <% if (request.rejection_reason) { %>
+                                <p><strong>Rejection Reason:</strong> <%= request.rejection_reason %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <% if (request.additional_notes) { %>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <p><strong>Additional Notes:</strong></p>
+                                <div class="alert alert-secondary">
+                                    <%= request.additional_notes %>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                    
+                    <% if (request.status === 'pending') { %>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#cancelRequestModal">
+                                    <i class="fas fa-times"></i> Cancel Request
+                                </button>
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#editRequestModal">
+                                    <i class="fas fa-edit"></i> Edit Request
+                                </button>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Recipient Information Card (if available) -->
+            <% if (recipient) { %>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-success">Recipient Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Name:</strong> <%= recipient.name %></p>
+                                <p><strong>Age:</strong> <%= recipient.age %></p>
+                                <p><strong>Gender:</strong> <%= recipient.gender %></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Blood Type:</strong> <%= recipient.blood_type %></p>
+                                <p><strong>Contact:</strong> <%= recipient.contact_number %></p>
+                                <% if (recipient.medical_history) { %>
+                                    <p><strong>Medical History:</strong> <%= recipient.medical_history %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <a href="/hospitals/recipient/<%= recipient.recipient_id %>" class="btn btn-info">
+                                    <i class="fas fa-user"></i> View Recipient Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Status Timeline Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Request Timeline</h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="timeline-title">Request Created</h6>
+                                <p class="timeline-date"><%= new Date(request.request_date).toLocaleString() %></p>
+                            </div>
+                        </div>
+                        
+                        <% if (request.status === 'approved' || request.status === 'fulfilled') { %>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Request Approved</h6>
+                                    <p class="timeline-date"><%= new Date(request.approved_date).toLocaleString() %></p>
+                                </div>
+                            </div>
+                        <% } %>
+                        
+                        <% if (request.status === 'fulfilled') { %>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Request Fulfilled</h6>
+                                    <p class="timeline-date"><%= new Date(request.fulfilled_date).toLocaleString() %></p>
+                                </div>
+                            </div>
+                        <% } %>
+                        
+                        <% if (request.status === 'rejected') { %>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-danger"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Request Rejected</h6>
+                                    <p class="timeline-date"><%= new Date(request.updated_at).toLocaleString() %></p>
+                                    <% if (request.rejection_reason) { %>
+                                        <p class="text-danger"><%= request.rejection_reason %></p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% } %>
+                        
+                        <% if (request.status === 'cancelled') { %>
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-secondary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Request Cancelled</h6>
+                                    <p class="timeline-date"><%= new Date(request.updated_at).toLocaleString() %></p>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blood Availability Card (if pending or approved) -->
+            <% if (request.status === 'pending' || request.status === 'approved') { %>
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Blood Availability</h6>
+                    </div>
+                    <div class="card-body">
+                        <% if (bloodAvailability) { %>
+                            <div class="text-center mb-3">
+                                <h4><%= request.blood_type %></h4>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar <%= bloodAvailability.units >= request.units ? 'bg-success' : 'bg-warning' %>" 
+                                        role="progressbar" 
+                                        style="width: <%= Math.min(bloodAvailability.units / request.units * 100, 100) %>%;" 
+                                        aria-valuenow="<%= bloodAvailability.units %>" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="<%= request.units %>">
+                                        <%= bloodAvailability.units %> / <%= request.units %> units
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-center">
+                                <% if (bloodAvailability.units >= request.units) { %>
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle"></i> Sufficient units available
+                                    </span>
+                                <% } else { %>
+                                    <span class="text-warning">
+                                        <i class="fas fa-exclamation-triangle"></i> Insufficient units available
+                                    </span>
+                                <% } %>
+                            </p>
+                        <% } else { %>
+                            <p class="text-center text-danger">
+                                <i class="fas fa-times-circle"></i> No units available for this blood type
+                            </p>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Request Modal -->
+<div class="modal fade" id="cancelRequestModal" tabindex="-1" role="dialog" aria-labelledby="cancelRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelRequestModalLabel">Confirm Cancellation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to cancel this blood request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form action="/hospitals/request/<%= request.request_id %>?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger">Cancel Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Request Modal -->
+<div class="modal fade" id="editRequestModal" tabindex="-1" role="dialog" aria-labelledby="editRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRequestModalLabel">Edit Blood Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/hospitals/request/<%= request.request_id %>?_method=PUT" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="units">Number of Units Required</label>
+                        <input type="number" class="form-control" id="units" name="units" min="1" value="<%= request.units %>" required>
+                        <small class="form-text text-muted">1 unit = 450-500 ml of whole blood</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="priority">Priority Level</label>
+                        <select class="form-control" id="priority" name="priority" required>
+                            <option value="Emergency" <%= request.priority === 'Emergency' ? 'selected' : '' %>>Emergency - Immediate (within hours)</option>
+                            <option value="Urgent" <%= request.priority === 'Urgent' ? 'selected' : '' %>>Urgent - Within 24 hours</option>
+                            <option value="High" <%= request.priority === 'High' ? 'selected' : '' %>>High - Within 48 hours</option>
+                            <option value="Regular" <%= request.priority === 'Regular' ? 'selected' : '' %>>Regular - Within a week</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="required_date">Required By</label>
+                        <input type="date" class="form-control" id="required_date" name="required_date" value="<%= request.required_date.toISOString().split('T')[0] %>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additional_notes">Additional Notes</label>
+                        <textarea class="form-control" id="additional_notes" name="additional_notes" rows="3"><%= request.additional_notes %></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Timeline styling */
+.timeline {
+    position: relative;
+    padding-left: 45px;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    width: 2px;
+    background-color: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.timeline-title {
+    margin-bottom: 5px;
+}
+
+.timeline-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+</style> 

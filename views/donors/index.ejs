@@ -1,0 +1,125 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>All Donors</h1>
+            <p class="lead">View all blood donors in our system</p>
+        </div>
+        <div class="col-md-4">
+            <!-- <form action="/donors/search" method="GET" class="form-inline">
+                <div class="input-group w-100">
+                    <input type="text" name="query" class="form-control" placeholder="Search donors..." value="<%= typeof query !== 'undefined' ? query : '' %>">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form> -->
+            <!-- <div class="mt-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="bloodTypeFilter" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Filter by Blood Type
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="bloodTypeFilter">
+                        <a class="dropdown-item" href="/donors/search?bloodType=A%2B">A+</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=A-">A-</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=B%2B">B+</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=B-">B-</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=AB%2B">AB+</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=AB-">AB-</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=O%2B">O+</a>
+                        <a class="dropdown-item" href="/donors/search?bloodType=O-">O-</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/donors">Clear Filter</a>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <% if (donors && donors.length > 0) { %>
+        <div class="row">
+            <% donors.forEach((donor, index) => { %>
+                <div class="col-md-4 mb-4">
+                    <div class="card donor-card h-100 shadow-sm">
+                        <div class="text-center mt-3">
+                            <% if (donor.profile_image) { %>
+                                <img src="<%= donor.profile_image %>" alt="<%= donor.full_name || donor.name %>" class="rounded-circle donor-image" width="120" height="120">
+                            <% } else { %>
+                                <div class="rounded-circle bg-primary donor-image d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
+                                    <i class="fas fa-user fa-4x text-white"></i>
+                                </div>
+                            <% } %>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title text-center"><%= donor.full_name || donor.name %></h5>
+                            <div class="blood-type-badge">
+                                <span class="badge badge-danger"><%= donor.blood_group || donor.blood_type %></span>
+                            </div>
+                            <div class="donor-details mt-3">
+                                <p><i class="fas fa-map-marker-alt"></i> <%= donor.address || 'No address provided' %></p>
+                                <p><i class="fas fa-phone"></i> <%= donor.contact_number || donor.phone || donor.contact_no || 'No contact provided' %></p>
+                                <p><i class="fas fa-envelope"></i> <%= donor.email || 'No email provided' %></p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white text-center">
+                            <a href="/donors/profile/<%= donor.donor_id %>" class="btn btn-sm btn-outline-primary">View Profile</a>
+                            <!-- <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'staff')) { %>
+                                <a href="/donors/<%= donor.donor_id %>" class="btn btn-sm btn-outline-info">Details</a>
+                            <% } %> -->
+                        </div>
+                    </div>
+                </div>
+                <% if ((index + 1) % 3 === 0 && index < donors.length - 1) { %>
+                    </div><div class="row">
+                <% } %>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i> No donors found. 
+            <% if (typeof query !== 'undefined' || typeof bloodType !== 'undefined') { %>
+                <a href="/donors">Clear search and filters</a>
+            <% } else { %>
+                Please add donors to the system.
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<style>
+.donor-card {
+    transition: transform 0.3s ease-in-out;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.donor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+.donor-image {
+    object-fit: cover;
+    border: 3px solid #f8f9fa;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.blood-type-badge {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+.blood-type-badge .badge {
+    font-size: 1rem;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+.donor-details {
+    color: #6c757d;
+}
+.donor-details i {
+    width: 20px;
+    margin-right: 5px;
+    text-align: center;
+}
+</style> 

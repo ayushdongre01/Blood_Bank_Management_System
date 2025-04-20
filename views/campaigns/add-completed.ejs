@@ -1,0 +1,140 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Add Completed Campaign</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/campaigns/completed" method="POST" class="needs-validation" novalidate>
+                        <!-- Hospital Information -->
+                        <% if (hospital) { %>
+                            <input type="hidden" name="hospital_id" value="<%= hospital.hospital_id %>">
+                        <% } %>
+                        
+                        <!-- Campaign Details -->
+                        <div class="form-group">
+                            <label for="campaign_name">Campaign Name *</label>
+                            <input type="text" class="form-control" id="campaign_name" name="campaign_name" required>
+                            <div class="invalid-feedback">
+                                Campaign name is required.
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location *</label>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                            <div class="invalid-feedback">
+                                Location is required.
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="start_date">Start Date *</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                    <div class="invalid-feedback">
+                                        Start date is required.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="end_date">End Date *</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                    <div class="invalid-feedback">
+                                        End date is required for completed campaigns.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="organizer">Organizer *</label>
+                            <input type="text" class="form-control" id="organizer" name="organizer" value="<%= hospital ? hospital.hospital_name : '' %>" required>
+                            <div class="invalid-feedback">
+                                Organizer is required.
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amount_collected">Amount Collected (units) *</label>
+                            <input type="number" class="form-control" id="amount_collected" name="amount_collected" min="0" step="1" required>
+                            <div class="invalid-feedback">
+                                Amount collected is required.
+                            </div>
+                            <small class="form-text text-muted">Total blood volume collected during the campaign</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="donors_participated">Number of Donors</label>
+                            <input type="number" class="form-control" id="donors_participated" name="donors_participated" min="0">
+                            <small class="form-text text-muted">Optional: Total number of donors who participated</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Additional Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Any additional information about the campaign..."></textarea>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-info">Save Campaign</button>
+                            <a href="/campaigns" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // End date validation - should be after or same as start date
+    document.getElementById('start_date').addEventListener('change', function() {
+        document.getElementById('end_date').setAttribute('min', this.value);
+    });
+    
+    // Set today as the maximum date for end date (can't be in the future)
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var yyyy = today.getFullYear();
+    
+    today = yyyy + '-' + mm + '-' + dd;
+    document.getElementById('end_date').setAttribute('max', today);
+});
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Ensure end date is after start date
+                var startDate = new Date(document.getElementById('start_date').value);
+                var endDate = new Date(document.getElementById('end_date').value);
+                
+                if (endDate < startDate) {
+                    document.getElementById('end_date').setCustomValidity('End date must be after start date');
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    document.getElementById('end_date').setCustomValidity('');
+                }
+                
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script> 

@@ -1,0 +1,49 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white text-center">
+                    <h2 class="mb-0"><i class="fas fa-certificate me-2"></i> Blood Donation Certificate</h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4 text-danger mb-3">Certificate of Appreciation</div>
+                        <p class="lead">This certificate is presented to</p>
+                        <h1 class="display-5 fw-bold text-primary mb-3"><%= donor.name %></h1>
+                        <p class="lead">for the selfless act of donating blood on</p>
+                        <h3 class="mb-3"><%= new Date(donation.appointment_date).toLocaleDateString() %></h3>
+                        <p class="lead">Your contribution of <strong><%= donation.volume_ml %> ml</strong> of blood will help save lives.</p>
+                        
+                        <div class="my-5 d-flex justify-content-between">
+                            <div>
+                                <p class="mb-0">Date Issued:</p>
+                                <p><%= new Date().toLocaleDateString() %></p>
+                            </div>
+                            <div>
+                                <p class="mb-0">Certificate ID:</p>
+                                <p>BDC-<%= donation.donation_id %></p>
+                            </div>
+                            <div>
+                                <p class="mb-0">Authorized By:</p>
+                                <p>Blood Bank Administration</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-muted small">Thank you for your generous donation. Your contribution makes a significant impact in our community.</p>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="/donors/certificate/<%= donation.donation_id %>/print" class="btn btn-outline-danger">
+                        <i class="fas fa-print me-2"></i> Print Certificate
+                    </a>
+                    <a href="/donors/donation/request/<%= donation.donation_id %>" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Donation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

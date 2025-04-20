@@ -1,0 +1,159 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-tint"></i> Donation Requests</h1>
+        <div>
+            <a href="/admin/dashboard" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Donation Requests</h6>
+        </div>
+        <div class="card-body">
+            <form action="/admin/donation-requests" method="GET" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">All Statuses</option>
+                        <option value="pending" <%= status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="approved" <%= status === 'approved' ? 'selected' : '' %>>Approved</option>
+                        <option value="rejected" <%= status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="bloodType">Blood Type</label>
+                    <select class="form-control" id="bloodType" name="bloodType">
+                        <option value="">All Blood Types</option>
+                        <option value="A+" <%= bloodType === 'A+' ? 'selected' : '' %>>A+</option>
+                        <option value="A-" <%= bloodType === 'A-' ? 'selected' : '' %>>A-</option>
+                        <option value="B+" <%= bloodType === 'B+' ? 'selected' : '' %>>B+</option>
+                        <option value="B-" <%= bloodType === 'B-' ? 'selected' : '' %>>B-</option>
+                        <option value="AB+" <%= bloodType === 'AB+' ? 'selected' : '' %>>AB+</option>
+                        <option value="AB-" <%= bloodType === 'AB-' ? 'selected' : '' %>>AB-</option>
+                        <option value="O+" <%= bloodType === 'O+' ? 'selected' : '' %>>O+</option>
+                        <option value="O-" <%= bloodType === 'O-' ? 'selected' : '' %>>O-</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="dateRange">Date Range</label>
+                    <input type="text" class="form-control" id="dateRange" name="dateRange" value="<%= dateRange %>">
+                </div>
+                <div class="col-md-3 mb-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donation Requests Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Donation Requests</h6>
+            <div>
+                <span class="badge badge-light"><%= donations.length %> result(s)</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <% if (donations && donations.length > 0) { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="donationsTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Donor</th>
+                                <th>Blood Type</th>
+                                <th>Volume</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% donations.forEach(donation => { %>
+                                <tr>
+                                    <td><%= donation.id %></td>
+                                    <td>
+                                        <a href="/admin/donors/<%= donation.donor_id %>">
+                                            <%= donation.donor_name %>
+                                        </a>
+                                    </td>
+                                    <td><span class="badge badge-danger"><%= donation.blood_type %></span></td>
+                                    <td><%= donation.volume %> mL</td>
+                                    <td><%= new Date(donation.donation_date).toLocaleDateString() %></td>
+                                    <td>
+                                        <% if (donation.status === 'pending') { %>
+                                            <span class="badge badge-warning">Pending</span>
+                                        <% } else if (donation.status === 'approved') { %>
+                                            <span class="badge badge-success">Approved</span>
+                                        <% } else if (donation.status === 'rejected') { %>
+                                            <span class="badge badge-danger">Rejected</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (donation.status === 'pending') { %>
+                                            <div class="btn-group btn-group-sm">
+                                                <form action="/admin/donations/<%= donation.id %>/approve" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-success btn-sm mr-1">
+                                                        <i class="fas fa-check"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form action="/admin/donations/<%= donation.id %>/reject" method="POST" class="d-inline">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-times"></i> Reject
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        <% } else { %>
+                                            <a href="/admin/donations/<%= donation.id %>" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle mr-2"></i> No donation requests found with the current filters.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize date range picker
+        $('#dateRange').daterangepicker({
+            opens: 'left',
+            autoUpdateInput: false,
+            locale: {
+                cancelLabel: 'Clear'
+            }
+        });
+
+        $('#dateRange').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        });
+
+        $('#dateRange').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+
+        // Initialize DataTable
+        $('#donationsTable').DataTable({
+            responsive: true,
+            order: [[4, 'desc']], // Order by date column descending
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search..."
+            }
+        });
+    });
+</script> 

@@ -1,0 +1,41 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><%= title %></h4>
+                </div>
+                <div class="card-body">
+                    <form action="/inventory/update/<%= inventory.inventory_id ? inventory.inventory_id : inventory.blood_type %>" method="POST">
+                        
+                        <div class="form-group mb-3">
+                            <label for="blood_type">Blood Type</label>
+                            <input type="text" class="form-control" id="blood_type" name="blood_type" value="<%= inventory.blood_type %>" readonly>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="quantity_available">Quantity Available (units)</label>
+                            <input type="number" class="form-control" id="quantity_available" name="quantity_available" value="<%= inventory.quantity_available %>" min="0" step="0.1" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="current_status">Status</label>
+                            <select class="form-control" id="current_status" name="current_status">
+                                <option value="available" <%= inventory.current_status === 'available' ? 'selected' : '' %>>Available</option>
+                                <option value="reserved" <%= inventory.current_status === 'reserved' ? 'selected' : '' %>>Reserved</option>
+                                <option value="unavailable" <%= inventory.current_status === 'unavailable' ? 'selected' : '' %>>Unavailable</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group text-center mt-4">
+                            <button type="submit" class="btn btn-primary">Update Inventory</button>
+                            <a href="/inventory" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

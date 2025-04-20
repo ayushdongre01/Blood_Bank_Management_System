@@ -1,0 +1,336 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-calendar-alt"></i> Blood Donation Campaigns</h2>
+        <div>
+            <a href="/admin/campaigns/new" class="btn btn-success">
+                <i class="fas fa-plus"></i> Create New Campaign
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">All Campaigns</h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="campaignSearch" class="form-control" placeholder="Search campaigns...">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="campaignTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="all-tab" data-toggle="tab" href="#all" role="tab">
+                        All Campaigns
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab">
+                        Upcoming <span class="badge badge-primary"><%= upcomingCount %></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="active-tab" data-toggle="tab" href="#active" role="tab">
+                        Active <span class="badge badge-success"><%= activeCount %></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab">
+                        Completed <span class="badge badge-secondary"><%= completedCount %></span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="tab-content mt-4" id="campaignTabContent">
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <% if (campaigns && campaigns.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="campaignsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Dates</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Donors</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% campaigns.forEach(campaign => { %>
+                                        <tr>
+                                            <td>
+                                                <strong><%= campaign.name %></strong>
+                                                <% if (campaign.description) { %>
+                                                    <p class="text-muted small mb-0 text-truncate" style="max-width: 250px;"><%= campaign.description %></p>
+                                                <% } %>
+                                            </td>
+                                            <td><%= campaign.location %></td>
+                                            <td>
+                                                <div><i class="far fa-calendar-alt text-muted"></i> <%= new Date(campaign.start_date).toLocaleDateString() %></div>
+                                                <div><i class="far fa-calendar-check text-muted"></i> <%= new Date(campaign.end_date).toLocaleDateString() %></div>
+                                            </td>
+                                            <td class="text-center">
+                                                <% 
+                                                    const today = new Date();
+                                                    const startDate = new Date(campaign.start_date);
+                                                    const endDate = new Date(campaign.end_date);
+                                                    let status, badgeClass;
+                                                    
+                                                    if (today < startDate) {
+                                                        status = "Upcoming";
+                                                        badgeClass = "badge-primary";
+                                                    } else if (today <= endDate) {
+                                                        status = "Active";
+                                                        badgeClass = "badge-success";
+                                                    } else {
+                                                        status = "Completed";
+                                                        badgeClass = "badge-secondary";
+                                                    }
+                                                %>
+                                                <span class="badge <%= badgeClass %>"><%= status %></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info"><%= campaign.donor_count || 0 %></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>/edit" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            data-campaign-id="<%= campaign.campaign_id %>" 
+                                                            data-campaign-name="<%= campaign.name %>"
+                                                            data-toggle="modal" 
+                                                            data-target="#deleteCampaignModal" 
+                                                            title="Delete">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No campaigns found. Get started by creating your first campaign!
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Upcoming Campaigns Tab -->
+                <div class="tab-pane fade" id="upcoming" role="tabpanel">
+                    <% if (upcomingCampaigns && upcomingCampaigns.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% upcomingCampaigns.forEach(campaign => { %>
+                                        <tr>
+                                            <td><strong><%= campaign.name %></strong></td>
+                                            <td><%= campaign.location %></td>
+                                            <td><%= new Date(campaign.start_date).toLocaleDateString() %></td>
+                                            <td><%= new Date(campaign.end_date).toLocaleDateString() %></td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>/edit" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No upcoming campaigns found.
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Active Campaigns Tab -->
+                <div class="tab-pane fade" id="active" role="tabpanel">
+                    <% if (activeCampaigns && activeCampaigns.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Dates</th>
+                                        <th class="text-center">Donors</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% activeCampaigns.forEach(campaign => { %>
+                                        <tr>
+                                            <td><strong><%= campaign.name %></strong></td>
+                                            <td><%= campaign.location %></td>
+                                            <td>
+                                                <%= new Date(campaign.start_date).toLocaleDateString() %> - 
+                                                <%= new Date(campaign.end_date).toLocaleDateString() %>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info"><%= campaign.donor_count || 0 %></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>/edit" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No active campaigns found.
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Completed Campaigns Tab -->
+                <div class="tab-pane fade" id="completed" role="tabpanel">
+                    <% if (completedCampaigns && completedCampaigns.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Dates</th>
+                                        <th class="text-center">Total Donors</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% completedCampaigns.forEach(campaign => { %>
+                                        <tr>
+                                            <td><strong><%= campaign.name %></strong></td>
+                                            <td><%= campaign.location %></td>
+                                            <td>
+                                                <%= new Date(campaign.start_date).toLocaleDateString() %> - 
+                                                <%= new Date(campaign.end_date).toLocaleDateString() %>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-info"><%= campaign.donor_count || 0 %></span>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a href="/admin/campaigns/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/admin/campaigns/reports/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-success" title="View Report">
+                                                        <i class="fas fa-chart-bar"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No completed campaigns found.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Campaign Modal -->
+<div class="modal fade" id="deleteCampaignModal" tabindex="-1" role="dialog" aria-labelledby="deleteCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCampaignModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the campaign <strong id="campaignNameToDelete"></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-circle"></i> This action cannot be undone. All associated donations and registrations will be permanently deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form id="deleteCampaignForm" action="/admin/campaigns/:id?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Campaign</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize DataTable
+        $('#campaignsTable').DataTable({
+            responsive: true,
+            order: [[2, 'asc']], // Sort by date column by default
+            language: {
+                search: "Search campaigns:",
+                lengthMenu: "Show _MENU_ campaigns per page",
+                zeroRecords: "No campaigns found",
+                info: "Showing _START_ to _END_ of _TOTAL_ campaigns",
+                infoEmpty: "Showing 0 to 0 of 0 campaigns",
+                infoFiltered: "(filtered from _MAX_ total campaigns)"
+            }
+        });
+        
+        // Delete campaign modal setup
+        $('#deleteCampaignModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const campaignId = button.data('campaign-id');
+            const campaignName = button.data('campaign-name');
+            
+            $('#campaignNameToDelete').text(campaignName);
+            $('#deleteCampaignForm').attr('action', `/admin/campaigns/${campaignId}?_method=DELETE`);
+        });
+        
+        // Campaign search functionality
+        $('#campaignSearch').on('keyup', function() {
+            const value = $(this).val().toLowerCase();
+            $('#campaignsTable tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+    });
+</script> 

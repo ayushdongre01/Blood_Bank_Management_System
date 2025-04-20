@@ -1,0 +1,109 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-heartbeat"></i> Donate Blood</h1>
+            <p class="text-muted">Request to donate blood and save lives.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Donation Request Form</h5>
+                </div>
+                <div class="card-body">
+                    <% if (!isEligible) { %>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i> You're not eligible to donate at this time.
+                            <% if (nextEligibleDate) { %>
+                                <strong>You will be eligible after <%= nextEligibleDate %></strong>
+                            <% } %>
+                        </div>
+                    <% } else { %>
+                        <form action="/donors/donation/request" method="POST">
+                            <div class="mb-3">
+                                <label for="donationDate" class="form-label">Preferred Donation Date</label>
+                                <input type="date" class="form-control" id="donationDate" name="donationDate" required 
+                                       min="<%= new Date().toISOString().split('T')[0] %>">
+                                <div class="form-text">Choose a date for your donation.</div>
+                            </div>
+                            
+                            <% if (campaigns && campaigns.length > 0) { %>
+                                <div class="mb-3">
+                                    <label for="campaignId" class="form-label">Campaign (Optional)</label>
+                                    <select class="form-select" id="campaignId" name="campaignId">
+                                        <option value="">Select a campaign</option>
+                                        <% campaigns.forEach(campaign => { %>
+                                            <option value="<%= campaign.campaign_id %>"><%= campaign.name %> - <%= new Date(campaign.start_date).toLocaleDateString() %></option>
+                                        <% }); %>
+                                    </select>
+                                    <div class="form-text">If you want to donate as part of a campaign, select it here.</div>
+                                </div>
+                            <% } %>
+                            
+                            <div class="mb-3">
+                                <label for="healthUpdate" class="form-label">Health Update (Optional)</label>
+                                <textarea class="form-control" id="healthUpdate" name="healthUpdate" rows="3"></textarea>
+                                <div class="form-text">Share any recent health updates or medications.</div>
+                            </div>
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="agreement" required>
+                                <label class="form-check-label" for="agreement">
+                                    I confirm that I am feeling well and am fit to donate blood.
+                                </label>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-heart me-2"></i> Submit Donation Request
+                                </button>
+                            </div>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Donor Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Name:</strong> <%= donor.name %></p>
+                    <p><strong>Blood Type:</strong> <span class="badge bg-danger"><%= donor.blood_type %></span></p>
+                    <!-- <p><strong>Last Donation:</strong> <%= donor.last_donation_date ? new Date(donor.last_donation_date).toLocaleDateString() : 'Never' %></p> -->
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Donation Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success me-2"></i> You must be at least 18 years old
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success me-2"></i> You should weigh at least 50 kg
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success me-2"></i> You must be in good health
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success me-2"></i> Must have hemoglobin levels of at least 12.5 g/dL
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-check-circle text-success me-2"></i> Must not have donated in the last 3 months
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

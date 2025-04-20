@@ -1,0 +1,201 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/campaigns">Campaigns</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create New Campaign</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-calendar-plus"></i> Create Blood Donation Campaign</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Campaign Information</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/campaigns" method="POST" id="campaignForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Campaign Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="startDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="startDate" name="startDate" required 
+                                       min="<%= new Date().toISOString().split('T')[0] %>">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="endDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="endDate" name="endDate" required 
+                                       min="<%= new Date().toISOString().split('T')[0] %>">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="location" name="location" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="targetDonors" class="form-label">Target Number of Donors</label>
+                                <input type="number" class="form-control" id="targetDonors" name="targetDonors" min="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="organizer" class="form-label">Organizer</label>
+                                <input type="text" class="form-control" id="organizer" name="organizer">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Campaign Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contactEmail" class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" id="contactEmail" name="contactEmail">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="contactPhone" class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="contactPhone" name="contactPhone">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Campaign Image</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            <div class="form-text">Upload an image for the campaign (optional)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="isPublished" name="isPublished" checked>
+                                <label class="form-check-label" for="isPublished">
+                                    Publish Campaign
+                                </label>
+                                <div class="form-text">If checked, the campaign will be visible to the public immediately.</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5>Additional Details</h5>
+                        <div class="mb-3">
+                            <label for="eligibilityCriteria" class="form-label">Eligibility Criteria</label>
+                            <textarea class="form-control" id="eligibilityCriteria" name="eligibilityCriteria" rows="3"></textarea>
+                            <div class="form-text">Specific eligibility requirements for this campaign (optional)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="incentives" class="form-label">Incentives</label>
+                            <textarea class="form-control" id="incentives" name="incentives" rows="2"></textarea>
+                            <div class="form-text">Any special incentives for donors (optional)</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="/admin/campaigns" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Campaign</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Campaign Tips</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small">Fields marked with <span class="text-danger">*</span> are required.</p>
+                    <ul class="small">
+                        <li>Choose a descriptive campaign name that reflects its purpose</li>
+                        <li>Make sure your start and end dates are correct</li>
+                        <li>Provide a detailed description to attract donors</li>
+                        <li>Include specific location details to help donors find you</li>
+                        <li>Upload an appealing image to promote your campaign</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Campaign Promotion</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small">After creating your campaign:</p>
+                    <ul class="small">
+                        <li>Share the campaign with existing donors</li>
+                        <li>Promote the campaign on social media</li>
+                        <li>Send email notifications to registered donors</li>
+                        <li>Display posters at the blood bank location</li>
+                        <li>Track campaign performance and adjust as needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        // Ensure end date is not before start date
+        startDateInput.addEventListener('change', function() {
+            if (endDateInput.value && startDateInput.value > endDateInput.value) {
+                endDateInput.value = startDateInput.value;
+            }
+            endDateInput.min = startDateInput.value;
+        });
+        
+        // Form validation
+        const form = document.getElementById('campaignForm');
+        form.addEventListener('submit', function(event) {
+            let valid = true;
+            
+            // Basic validation example
+            const name = document.getElementById('name').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const description = document.getElementById('description').value.trim();
+            
+            if (name === '') {
+                valid = false;
+                alert('Please enter a campaign name');
+            } else if (location === '') {
+                valid = false;
+                alert('Please enter a campaign location');
+            } else if (description === '') {
+                valid = false;
+                alert('Please enter a campaign description');
+            }
+            
+            if (!valid) {
+                event.preventDefault();
+            }
+        });
+        
+        // Initialize today's date for start date if not already set
+        if (!startDateInput.value) {
+            const today = new Date();
+            startDateInput.value = today.toISOString().split('T')[0];
+            endDateInput.min = today.toISOString().split('T')[0];
+            
+            // Set default end date to 7 days after start date
+            const endDate = new Date(today);
+            endDate.setDate(endDate.getDate() + 7);
+            endDateInput.value = endDate.toISOString().split('T')[0];
+        }
+    });
+</script> 

@@ -1,0 +1,232 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/hospitals">Hospitals</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Add New Hospital</li>
+                </ol>
+            </nav>
+            <h2><i class="fas fa-hospital-plus"></i> Add New Hospital</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Hospital Information</h5>
+                </div>
+                <div class="card-body">
+                    <form action="/admin/hospitals" method="POST" id="newHospitalForm" novalidate>
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="name" class="form-label">Hospital Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="hospital[name]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a hospital name.
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="type" class="form-label">Hospital Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="type" name="hospital[type]" required>
+                                    <option value="" selected disabled>Select type...</option>
+                                    <option value="government">Government</option>
+                                    <option value="private">Private</option>
+                                    <option value="charity">Charity/Non-profit</option>
+                                    <option value="research">Research/University</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a hospital type.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="bedCount" class="form-label">Number of Beds</label>
+                                <input type="number" class="form-control" id="bedCount" name="hospital[bedCount]" min="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="established" class="form-label">Established Year</label>
+                                <input type="number" class="form-control" id="established" name="hospital[established]" min="1800" max="<%= new Date().getFullYear() %>">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="registrationNumber" class="form-label">Registration Number</label>
+                                <input type="text" class="form-control" id="registrationNumber" name="hospital[registrationNumber]">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Contact Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" id="email" name="hospital[email]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="phone" name="hospital[phone]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid phone number.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="website" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="website" name="hospital[website]" placeholder="https://...">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="emergencyContact" class="form-label">Emergency Contact</label>
+                                <input type="tel" class="form-control" id="emergencyContact" name="hospital[emergencyContact]">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="primaryContactPerson" class="form-label">Primary Contact Person</label>
+                                <input type="text" class="form-control" id="primaryContactPerson" name="hospital[primaryContactPerson]">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">Location</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="address" name="hospital[address]" rows="2" required></textarea>
+                                <div class="invalid-feedback">
+                                    Please provide an address.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-5">
+                                <label for="city" class="form-label">City <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="city" name="hospital[city]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a city.
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="state" name="hospital[state]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a state.
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="zipCode" class="form-label">Zip Code <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="zipCode" name="hospital[zipCode]" required>
+                                <div class="invalid-feedback">
+                                    Please provide a zip code.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label for="notes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="notes" name="hospital[notes]" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="hospital[isActive]" checked>
+                            <label class="form-check-label" for="isActive">
+                                Active Status
+                            </label>
+                            <div class="form-text">If checked, the hospital will be listed as active in the system.</div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="/admin/hospitals" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Hospital</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Tips</h5>
+                </div>
+                <div class="card-body">
+                    <p><small>Fields marked with <span class="text-danger">*</span> are required.</small></p>
+                    <ul class="small">
+                        <li>Add as much detail as possible to help users find this hospital.</li>
+                        <li>You'll be able to set up blood inventory after creating the hospital.</li>
+                        <li>Make sure to add accurate contact information for emergency purposes.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">System Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small">Once created, this hospital will be:</p>
+                    <ul class="small">
+                        <li>Listed in the main hospital directory</li>
+                        <li>Available for blood donation requests</li>
+                        <li>Able to manage blood inventory</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation
+    (() => {
+        'use strict'
+        const form = document.getElementById('newHospitalForm');
+        
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Email validation
+        const emailInput = document.getElementById('email');
+        emailInput.addEventListener('input', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(emailInput.value)) {
+                emailInput.setCustomValidity('');
+            } else {
+                emailInput.setCustomValidity('Please enter a valid email address');
+            }
+        });
+        
+        // Phone validation
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', () => {
+            const phoneRegex = /^(\+\d{1,3})?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/;
+            if (phoneRegex.test(phoneInput.value) || phoneInput.value === '') {
+                phoneInput.setCustomValidity('');
+            } else {
+                phoneInput.setCustomValidity('Please enter a valid phone number');
+            }
+        });
+    })();
+</script> 

@@ -1,0 +1,241 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Donor Profile Section -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user-circle"></i> Donor Profile</h4>
+                </div>
+                <div class="card-body text-center">
+                    <% if (donor && donor.profile_image) { %>
+                        <img src="<%= donor.profile_image %>" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    <% } else { %>
+                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px; font-size: 60px; color: #6c757d;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    <% } %>
+                    <h3 class="mb-0"><%= donor.name || 'Donor' %></h3>
+                    <p class="text-muted"><%= donor.email || '' %></p>
+                    
+                    <div class="blood-type-badge mt-2 mb-3">
+                        <span class="badge bg-danger fs-3 px-3 py-2"><%= donor.blood_type || '?' %></span>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush text-start">
+                        <% if (donor.gender) { %>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-venus-mars"></i> Gender:</strong>
+                            <span><%= donor.gender.charAt(0).toUpperCase() + donor.gender.slice(1) %></span>
+                        </li>
+                        <% } %>
+                        <% if (donor.date_of_birth) { %>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-birthday-cake"></i> Date of Birth:</strong>
+                            <span><%= new Date(donor.date_of_birth).toLocaleDateString() %></span>
+                        </li>
+                        <% } %>
+                        <% if (donor.contact_number) { %>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <strong><i class="fas fa-phone"></i> Contact:</strong>
+                            <span><%= donor.contact_number %></span>
+                        </li>
+                        <% } %>
+                        <% if (donor.address) { %>
+                            <li class="list-group-item">
+                                <strong><i class="fas fa-map-marker-alt"></i> Address:</strong>
+                                <p class="mb-0 mt-1"><%= donor.address %></p>
+                            </li>
+                        <% } %>
+                        <!-- <% if (donor.last_donation_date) { %>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <strong><i class="fas fa-calendar-check"></i> Last Donation:</strong>
+                                <span><%= new Date(donor.last_donation_date).toLocaleDateString() %></span>
+                            </li>
+                        <% } %> -->
+                    </ul>
+                    
+                    <!-- <div class="mt-3">
+                        <a href="/donors/edit-profile" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                        <a href="/donors/profile" class="btn btn-primary ms-2">
+                            <i class="fas fa-user-circle"></i> View Profile
+                        </a>
+                    </div> -->
+                </div>
+            </div>
+            
+            <!-- Donation Stats Cards -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-primary text-white mb-4 shadow">
+                        <div class="card-body text-center">
+                            <h2 class="display-4 mb-0"><%= donationStats?.count || 0 %></h2>
+                            <p class="mb-0"><i class="fas fa-tint"></i> Donations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-danger text-white mb-4 shadow">
+                        <div class="card-body text-center">
+                            <h2 class="display-4 mb-0"><%= donationStats?.total_volume_ml ? (donationStats.total_volume_ml/450).toFixed(1) : 0 %></h2>
+                            <p class="mb-0"><i class="fas fa-flask"></i> Units</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Donation History & Actions Section -->
+        <div class="col-md-8">
+            <!-- Quick Actions -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-cogs"></i> Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <a href="/donors/donation/request" class="btn btn-danger w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                <i class="fas fa-heartbeat fa-2x mb-2"></i>
+                                <span>Donate Blood</span>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="/donors/donation/requests" class="btn btn-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                <i class="fas fa-tasks fa-2x mb-2"></i>
+                                <span>My Requests</span>
+                            </a>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <a href="/campaigns" class="btn btn-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                                <span>Campaigns</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Donation History -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-history"></i> Donation History</h4>
+                </div>
+                <div class="card-body">
+                    <% if (donationHistory && donationHistory.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <!-- <th>ID</th> -->
+                                        <th>Donation/Appointment Date</th>
+                                        <th>Volume (ml)</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% donationHistory.forEach(donation => { %>
+                                        <tr>
+                                            <!-- <td><%= donation.donation_id %></td> -->
+                                            <td>
+                                                <% if (donation.appointment_date) { %>
+                                                    <%= new Date(donation.appointment_date).toLocaleDateString() %>
+                                                <% } else { %>
+                                                    <%= new Date(donation.donation_date).toLocaleDateString() %>
+                                                <% } %>
+                                            </td>
+                                            <td><%= donation.volume_ml %> ml</td>
+                                            <td>
+                                                <span class="badge bg-<%= 
+                                                    donation.status === 'completed' ? 'success' : 
+                                                    donation.status === 'approved' ? 'primary' : 
+                                                    donation.status === 'pending' ? 'warning' : 
+                                                    donation.status === 'rejected' ? 'danger' : 
+                                                    donation.status === 'cancelled' ? 'secondary' :
+                                                    'secondary' 
+                                                %>">
+                                                    <%= donation.status.charAt(0).toUpperCase() + donation.status.slice(1) %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a href="/donors/donation/request/<%= donation.donation_id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <% if (donation.status === 'pending' || donation.status === 'approved') { %>
+                                                    <form action="/donors/donation/request/<%= donation.donation_id %>/cancel" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this donation request?');">
+                                                        <button type="submit" class="btn btn-sm btn-secondary">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <% if (donationHistory.length > 5) { %>
+                            <!-- <div class="text-center mt-3">
+                                <a href="/donors/profile/requests" class="btn btn-outline-primary">
+                                    <i class="fas fa-list"></i> View All Donations
+                                </a>
+                            </div> -->
+                        <% } %>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> You haven't made any donations yet. Ready to save lives?
+                            <a href="/donors/donation/request" class="btn btn-sm btn-primary ms-2">
+                                <i class="fas fa-heartbeat"></i> Donate Now
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Upcoming Campaigns -->
+            <% if (upcomingCampaigns && upcomingCampaigns.length > 0) { %>
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0"><i class="fas fa-calendar-alt"></i> Upcoming Campaigns</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <% upcomingCampaigns.slice(0, 2).forEach(campaign => { %>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><%= campaign.name %></h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">
+                                                <i class="fas fa-map-marker-alt"></i> <%= campaign.location %>
+                                            </h6>
+                                            <p class="card-text">
+                                                <i class="fas fa-calendar"></i> 
+                                                <%= new Date(campaign.start_date).toLocaleDateString() %> - 
+                                                <%= new Date(campaign.end_date).toLocaleDateString() %>
+                                            </p>
+                                            <a href="/campaigns/<%= campaign.campaign_id %>" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-info-circle"></i> Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                        <% if (upcomingCampaigns.length > 2) { %>
+                            <div class="text-center mt-2">
+                                <a href="/campaigns" class="btn btn-outline-success">
+                                    <i class="fas fa-calendar-alt"></i> View All Campaigns
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

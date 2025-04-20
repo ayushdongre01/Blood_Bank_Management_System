@@ -1,0 +1,182 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Blood Requests</h1>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="/hospitals/request/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Request
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Requests</h6>
+        </div>
+        <div class="card-body">
+            <form action="/hospitals/requests" method="GET" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">All</option>
+                        <option value="pending" <%= filter && filter.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="approved" <%= filter && filter.status === 'approved' ? 'selected' : '' %>>Approved</option>
+                        <option value="fulfilled" <%= filter && filter.status === 'fulfilled' ? 'selected' : '' %>>Fulfilled</option>
+                        <option value="rejected" <%= filter && filter.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+                        <option value="cancelled" <%= filter && filter.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="bloodType">Blood Type</label>
+                    <select class="form-control" id="bloodType" name="bloodType">
+                        <option value="">All</option>
+                        <option value="A+" <%= filter && filter.bloodType === 'A+' ? 'selected' : '' %>>A+</option>
+                        <option value="A-" <%= filter && filter.bloodType === 'A-' ? 'selected' : '' %>>A-</option>
+                        <option value="B+" <%= filter && filter.bloodType === 'B+' ? 'selected' : '' %>>B+</option>
+                        <option value="B-" <%= filter && filter.bloodType === 'B-' ? 'selected' : '' %>>B-</option>
+                        <option value="AB+" <%= filter && filter.bloodType === 'AB+' ? 'selected' : '' %>>AB+</option>
+                        <option value="AB-" <%= filter && filter.bloodType === 'AB-' ? 'selected' : '' %>>AB-</option>
+                        <option value="O+" <%= filter && filter.bloodType === 'O+' ? 'selected' : '' %>>O+</option>
+                        <option value="O-" <%= filter && filter.bloodType === 'O-' ? 'selected' : '' %>>O-</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="dateFrom">Date From</label>
+                    <input type="date" class="form-control" id="dateFrom" name="dateFrom" value="<%= filter && filter.dateFrom ? filter.dateFrom : '' %>">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="dateTo">Date To</label>
+                    <input type="date" class="form-control" id="dateTo" name="dateTo" value="<%= filter && filter.dateTo ? filter.dateTo : '' %>">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="/hospitals/requests" class="btn btn-secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Blood Requests Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Blood Requests</h6>
+        </div>
+        <div class="card-body">
+            <% if (requests.length === 0) { %>
+                <p class="text-center">No blood requests found.</p>
+            <% } else { %>
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Date</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Priority</th>
+                                <th>Required By</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% requests.forEach(request => { %>
+                                <tr>
+                                    <td><%= request.request_id %></td>
+                                    <td><%= new Date(request.request_date).toLocaleDateString() %></td>
+                                    <td><%= request.blood_type %></td>
+                                    <td><%= request.units %></td>
+                                    <td>
+                                        <% if (request.priority === 'Emergency') { %>
+                                            <span class="badge badge-danger"><%= request.priority %></span>
+                                        <% } else if (request.priority === 'Urgent') { %>
+                                            <span class="badge badge-warning"><%= request.priority %></span>
+                                        <% } else if (request.priority === 'High') { %>
+                                            <span class="badge badge-primary"><%= request.priority %></span>
+                                        <% } else { %>
+                                            <span class="badge badge-info"><%= request.priority %></span>
+                                        <% } %>
+                                    </td>
+                                    <td><%= new Date(request.required_date).toLocaleDateString() %></td>
+                                    <td>
+                                        <% if (request.status === 'pending') { %>
+                                            <span class="badge badge-warning">Pending</span>
+                                        <% } else if (request.status === 'approved') { %>
+                                            <span class="badge badge-success">Approved</span>
+                                        <% } else if (request.status === 'fulfilled') { %>
+                                            <span class="badge badge-primary">Fulfilled</span>
+                                        <% } else if (request.status === 'rejected') { %>
+                                            <span class="badge badge-danger">Rejected</span>
+                                        <% } else { %>
+                                            <span class="badge badge-secondary">Cancelled</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <a href="/hospitals/request/<%= request.request_id %>" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <% if (request.status === 'pending') { %>
+                                            <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#cancelModal<%= request.request_id %>">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Cancel Modal -->
+                                <div class="modal fade" id="cancelModal<%= request.request_id %>" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel<%= request.request_id %>" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="cancelModalLabel<%= request.request_id %>">Confirm Cancellation</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to cancel this blood request?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <form action="/hospitals/request/<%= request.request_id %>?_method=DELETE" method="POST">
+                                                    <button type="submit" class="btn btn-danger">Cancel Request</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                <a class="page-link" href="/hospitals/requests?page=<%= currentPage - 1 %><%= filterQueryString %>" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="/hospitals/requests?page=<%= i %><%= filterQueryString %>"><%= i %></a>
+                                </li>
+                            <% } %>
+                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                <a class="page-link" href="/hospitals/requests?page=<%= currentPage + 1 %><%= filterQueryString %>" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+</div> 

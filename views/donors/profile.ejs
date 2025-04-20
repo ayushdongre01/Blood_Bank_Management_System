@@ -1,0 +1,222 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-user-circle text-danger"></i> Donor Profile</h2>
+
+    <div class="row">
+        <!-- Donor Details Section -->
+        <div class="col-md-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <% if (donor.profile_image) { %>
+                            <img src="<%= donor.profile_image %>" alt="Profile Image" class="img-fluid rounded-circle mb-3" style="width: 180px; height: 180px; object-fit: cover; border: 3px solid #dc3545;">
+                        <% } else { %>
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 180px; height: 180px; font-size: 80px; color: #dc3545; border: 3px solid #dc3545;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        <% } %>
+                        <h3 class="text-danger"><%= donor.name %></h3>
+                        
+                        <!-- Blood Type Badge -->
+                        <div class="mt-2 mb-3">
+                            <span class="badge bg-danger fs-4 px-3 py-2 rounded-pill">
+                                <i class="fas fa-tint me-1"></i> <%= donor.blood_type %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="donor-details">
+                        <div class="row border-bottom pb-2 mb-2">
+                            <div class="col-4 text-muted">
+                                <i class="fas fa-venus-mars me-1"></i> Gender
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <%= donor.gender %>
+                            </div>
+                        </div>
+                        
+                        <div class="row border-bottom pb-2 mb-2">
+                            <div class="col-4 text-muted">
+                                <i class="fas fa-birthday-cake me-1"></i> Date of Birth
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <%= new Date(donor.date_of_birth).toLocaleDateString() %>
+                            </div>
+                        </div>
+                        
+                        <div class="row border-bottom pb-2 mb-2">
+                            <div class="col-4 text-muted">
+                                <i class="fas fa-envelope me-1"></i> Email
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <%= donor.email %>
+                            </div>
+                        </div>
+                        
+                        <div class="row border-bottom pb-2 mb-2">
+                            <div class="col-4 text-muted">
+                                <i class="fas fa-phone me-1"></i> Contact
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <% if (donor.contact_no) { %>
+                                    <%= donor.contact_no %>
+                                <% } else { %>
+                                    <span class="text-muted">Not provided</span>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-4 text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i> Address
+                            </div>
+                            <div class="col-8 fw-bold">
+                                <%= donor.address %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="d-grid gap-2 mt-4">
+                        <a href="/donors/profile/edit" class="btn btn-outline-danger">
+                            <i class="fas fa-edit me-1"></i> Edit Profile
+                        </a>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Donation History Section -->
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Donation Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-danger">
+                                <div class="card-body text-center">
+                                    <h2 class="display-4 text-danger"><%= donationStats?.count || 0 %></h2>
+                                    <p class="text-muted mb-0">Total Donations</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-danger">
+                                <div class="card-body text-center">
+                                    <h2 class="display-4 text-danger"><%= donationStats?.total_volume_ml ? (donationStats.total_volume_ml/450).toFixed(1) : 0 %></h2>
+                                    <p class="text-muted mb-0">Units Donated</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h5 class="border-bottom pb-2 mb-3">Last Donation</h5>
+                        <% if (donationStats?.lastDonation) { %>
+                            <div class="row">
+                                <div class="col-4 text-muted">
+                                    <i class="fas fa-calendar me-1"></i> Date
+                                </div>
+                                <div class="col-8 fw-bold">
+                                    <% if (donationStats.lastDonation.latest_appointment_date) { %>
+                                        <%= new Date(donationStats.lastDonation.latest_appointment_date).toLocaleDateString() %>
+                                    <% } else if (donationStats.lastDonation.appointment_date) { %>
+                                        <%= new Date(donationStats.lastDonation.appointment_date).toLocaleDateString() %>
+                                    <% } else { %>
+                                        <%= new Date(donationStats.lastDonation.donation_date).toLocaleDateString() %>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-4 text-muted">
+                                    <i class="fas fa-clinic-medical me-1"></i> Center
+                                </div>
+                                <div class="col-8 fw-bold">
+                                    <%= donationStats.lastDonation.center_name || 'Blood Bank' %>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <p class="text-muted fst-italic">No donations recorded yet.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donation History -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Donation History</h5>
+                </div>
+                <div class="card-body">
+                    <% if (donationHistory && donationHistory.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Volume (ml)</th>
+                                        <th>Center</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% donationHistory.forEach(donation => { %>
+                                        <tr>
+                                            <td>
+                                                <% if (donation.appointment_date) { %>
+                                                    <%= new Date(donation.appointment_date).toLocaleDateString() %>
+                                                <% } else { %>
+                                                    <%= new Date(donation.donation_date).toLocaleDateString() %>
+                                                <% } %>
+                                            </td>
+                                            <td><%= donation.volume_ml %> ml</td>
+                                            <td><%= donation.center_name || 'Blood Bank' %></td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-<%= 
+                                                donation.status === 'completed' ? 'success' : 
+                                                donation.status === 'approved' ? 'primary' : 
+                                                donation.status === 'pending' ? 'warning' : 
+                                                donation.status === 'rejected' ? 'danger' :
+                                                donation.status === 'cancelled' ? 'secondary' :
+                                                'info' %>">
+                                                    <%= donation.status %>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <% if (donation.status === 'pending' || donation.status === 'approved') { %>
+                                                    <form action="/donors/donation/request/<%= donation.donation_id %>/cancel" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to cancel this donation request?');">
+                                                        <button type="submit" class="btn btn-sm btn-secondary">
+                                                            <i class="fas fa-times"></i> Cancel
+                                                        </button>
+                                                    </form>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-5">
+                            <i class="fas fa-tint text-muted fa-4x mb-3"></i>
+                            <h5 class="text-muted">No donation history yet</h5>
+                            <% if (currentUser.role === 'donor') { %>
+                                <p>Make your first blood donation to help save lives!</p>
+                                <a href="/donors/donation/request" class="btn btn-danger">
+                                    <i class="fas fa-heart me-1"></i> Request to Donate
+                                </a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

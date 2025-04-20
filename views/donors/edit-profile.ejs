@@ -1,0 +1,114 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0"><i class="fas fa-user-edit"></i> <%= donor ? 'Update' : 'Complete' %> Your Donor Profile</h3>
+                </div>
+                <div class="card-body">
+                    <% if (!donor) { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Please complete your donor profile to access the dashboard and donation features.
+                        </div>
+                    <% } %>
+
+                    <form action="/donors/profile?_method=PUT" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                    value="<%= donor ? donor.name : (userData ? userData.name : '') %>" required>
+                             
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="donor[email]" 
+                                           value="<%= donor ? donor.email : (userData ? userData.email : '') %>" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="gender" name="donor[gender]" required>
+                                        <option value="" disabled <%= !donor ? 'selected' : '' %>>Select Gender</option>
+                                        <option value="male" <%= donor && donor.gender === 'male' ? 'selected' : '' %>>Male</option>
+                                        <option value="female" <%= donor && donor.gender === 'female' ? 'selected' : '' %>>Female</option>
+                                        <option value="other" <%= donor && donor.gender === 'other' ? 'selected' : '' %>>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="date_of_birth" name="donor[date_of_birth]" 
+                                           value="<%= donor ? donor.date_of_birth : '' %>" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="blood_type" class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="blood_type" name="donor[blood_type]" required>
+                                        <option value="" disabled <%= !donor ? 'selected' : '' %>>Select Blood Type</option>
+                                        <option value="A+" <%= donor && donor.blood_type === 'A+' ? 'selected' : '' %>>A+</option>
+                                        <option value="A-" <%= donor && donor.blood_type === 'A-' ? 'selected' : '' %>>A-</option>
+                                        <option value="B+" <%= donor && donor.blood_type === 'B+' ? 'selected' : '' %>>B+</option>
+                                        <option value="B-" <%= donor && donor.blood_type === 'B-' ? 'selected' : '' %>>B-</option>
+                                        <option value="AB+" <%= donor && donor.blood_type === 'AB+' ? 'selected' : '' %>>AB+</option>
+                                        <option value="AB-" <%= donor && donor.blood_type === 'AB-' ? 'selected' : '' %>>AB-</option>
+                                        <option value="O+" <%= donor && donor.blood_type === 'O+' ? 'selected' : '' %>>O+</option>
+                                        <option value="O-" <%= donor && donor.blood_type === 'O-' ? 'selected' : '' %>>O-</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="contact_number" class="form-label">Contact Number <span class="text-danger">*</span></label>
+                                    <input type="tel" class="form-control" id="contact_number" name="donor[contact_number]" 
+                                           value="<%= donor ? donor.contact_number : '' %>" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <textarea class="form-control" id="address" name="donor[address]" rows="3"><%= donor ? donor.address : '' %></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="profile_image" class="form-label">Profile Image</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image">
+                            <% if (donor && donor.profile_image) { %>
+                                <div class="mt-2">
+                                    <img src="<%= donor.profile_image %>" alt="Current Profile Image" class="img-thumbnail" style="max-height: 100px;">
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> <%= donor ? 'Update Profile' : 'Save Profile' %>
+                            </button>
+                            <% if (donor) { %>
+                                <a href="/donors/profile/dashboard" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                            <% } %>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

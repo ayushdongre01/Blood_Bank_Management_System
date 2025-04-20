@@ -1,0 +1,203 @@
+<%- layout('layouts/boilerplate') %>
+<% const title = 'Home' %>
+
+<!-- Hero Section -->
+<section class="hero-section py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold text-danger mb-3">Donate Blood, Save Lives</h1>
+            <p style="font-family: 'Helvetica Neue', sans-serif; font-size: 1.2rem; color: #333; letter-spacing: 0.5px;" class="lead mb-4">
+                Your blood donation can give a precious gift to someone in need. Every drop counts in our mission to ensure that blood is available for all patients when they need it most.
+              </p>
+              
+                          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <!-- <a href="/donors/donation/request" class="btn btn-danger btn-lg px-4 me-md-2">Donate Now</a> -->
+                <% if(!currentUser) { %>
+                <a href="/register" class="btn btn-outline-danger btn-lg px-4">Join Us</a>
+                <% } %>
+            </div>
+        </div>
+        <div class="col-lg-6 mt-5 mt-lg-0">
+            <img src="/stylesheets/blood_bank.jpg" alt="Blood Donation" class="img-fluid rounded shadow">
+        </div>
+    </div>
+</section>
+
+<!-- Blood Type Information -->
+<section class="blood-types-section py-5 my-5 bg-light rounded">
+    <h2 class="text-center text-danger mb-5">Blood Type Compatibility</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-danger">
+                        <tr>
+                            <th>Blood Type</th>
+                            <th>Can Donate To</th>
+                            <th>Can Receive From</th>
+                            <th>Population %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">A+</td>
+                            <td>A+, AB+</td>
+                            <td>A+, A-, O+, O-</td>
+                            <td>35.7%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">A-</td>
+                            <td>A+, A-, AB+, AB-</td>
+                            <td>A-, O-</td>
+                            <td>6.3%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">B+</td>
+                            <td>B+, AB+</td>
+                            <td>B+, B-, O+, O-</td>
+                            <td>8.5%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">B-</td>
+                            <td>B+, B-, AB+, AB-</td>
+                            <td>B-, O-</td>
+                            <td>1.5%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">AB+</td>
+                            <td>AB+</td>
+                            <td>All Blood Types</td>
+                            <td>3.4%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">AB-</td>
+                            <td>AB+, AB-</td>
+                            <td>AB-, A-, B-, O-</td>
+                            <td>0.6%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">O+</td>
+                            <td>O+, A+, B+, AB+</td>
+                            <td>O+, O-</td>
+                            <td>37.4%</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">O-</td>
+                            <td>All Blood Types</td>
+                            <td>O-</td>
+                            <td>6.6%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="statistics-section py-5 my-5">
+    <h2 class="text-center text-danger mb-5">Blood Donation Impact</h2>
+    <div class="row text-center">
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <i class="fas fa-heartbeat text-danger mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title">3 Lives</h3>
+                    <p class="card-text">Each donation can save up to 3 lives</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <i class="fas fa-procedures text-danger mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title">Every 2 Seconds</h3>
+                    <p class="card-text">Someone needs blood every 2 seconds</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <i class="fas fa-hospital text-danger mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title">14.6 Million</h3>
+                    <p class="card-text">Indians need blood transfusions each year</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <i class="fas fa-tint text-danger mb-3" style="font-size: 2.5rem;"></i>
+                    <h3 class="card-title">1 Pint</h3>
+                    <p class="card-text">One donation is approximately 1 pint of blood</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section py-5 my-5 bg-light rounded">
+    <h2 class="text-center text-danger mb-5">The Donation Process</h2>
+    <div class="row">
+        <div class="col-md-3 mb-4 text-center">
+            <div class="bg-white p-4 rounded shadow-sm h-100">
+                <div class="process-icon rounded-circle bg-danger d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <i class="fas fa-clipboard-check text-white"></i>
+                </div>
+                <h4>1. Registration</h4>
+                <p>Sign up online or in person. We'll need your identification and basic health information.</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <div class="bg-white p-4 rounded shadow-sm h-100">
+                <div class="process-icon rounded-circle bg-danger d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <i class="fas fa-notes-medical text-white"></i>
+                </div>
+                <h4>2. Screening</h4>
+                <p>Quick health check including blood pressure, temperature, and hemoglobin levels.</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <div class="bg-white p-4 rounded shadow-sm h-100">
+                <div class="process-icon rounded-circle bg-danger d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <i class="fas fa-hand-holding-medical text-white"></i>
+                </div>
+                <h4>3. Donation</h4>
+                <p>The actual blood donation takes about 8-10 minutes. The entire process takes about an hour.</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <div class="bg-white p-4 rounded shadow-sm h-100">
+                <div class="process-icon rounded-circle bg-danger d-flex align-items-center justify-content-center mx-auto mb-3">
+                    <i class="fas fa-cookie-bite text-white"></i>
+                </div>
+                <h4>4. Refreshment</h4>
+                <p>After donating, you'll rest and enjoy snacks and drinks to replenish your fluids.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section py-5 my-5 bg-danger text-white rounded">
+    <div class="text-center">
+        <h2 class="mb-3">Ready to Make a Difference?</h2>
+        <p class="lead mb-4">Your donation can be the gift of life for someone in need.</p>
+        <% if(!currentUser) { %>    
+        <a href="/register" class="btn btn-light btn-lg px-4">Register Now</a>
+        <% } %>
+    </div>
+</section>
+
+<style>
+    .hero-section {
+        margin-top: 1.5rem;
+    }
+    .process-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 1.75rem;
+    }
+</style> 

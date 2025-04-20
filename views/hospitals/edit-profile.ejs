@@ -1,0 +1,220 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Hospital Profile</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/hospitals/profile" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+                        <input type="hidden" name="_method" value="PUT">
+                        
+                        <% if (hospital && hospital.profile_image) { %>
+                            <div class="text-center mb-4">
+                                <img src="<%= hospital.profile_image %>" alt="Hospital Logo" class="img-thumbnail" style="max-height: 150px;">
+                            </div>
+                        <% } %>
+                        
+                        <!-- Hospital Name -->
+                        <div class="form-group">
+                            <label for="hospital_name">Hospital Name *</label>
+                            <input type="text" class="form-control" id="hospital_name" name="hospital[hospital_name]" value="<%= hospital ? hospital.hospital_name : '' %>" required>
+                            <div class="invalid-feedback">
+                                Hospital name is required.
+                            </div>
+                        </div>
+                        
+                        <!-- License Number -->
+                        <div class="form-group">
+                            <label for="license_number">License Number *</label>
+                            <input type="text" class="form-control" id="license_number" name="license_number" value="<%= hospital ? hospital.license_number : '' %>" required>
+                            <div class="invalid-feedback">
+                                License number is required.
+                            </div>
+                        </div>
+                        
+                        <!-- Type of Hospital -->
+                        <div class="form-group">
+                            <label for="type">Type of Hospital *</label>
+                            <select class="form-control" id="type" name="type" required>
+                                <option value="" disabled <%= !hospital ? 'selected' : '' %>>Select hospital type</option>
+                                <option value="Government" <%= hospital && hospital.type === 'Government' ? 'selected' : '' %>>Government</option>
+                                <option value="Private" <%= hospital && hospital.type === 'Private' ? 'selected' : '' %>>Private</option>
+                                <option value="Non-Profit" <%= hospital && hospital.type === 'Non-Profit' ? 'selected' : '' %>>Non-Profit</option>
+                                <option value="Teaching" <%= hospital && hospital.type === 'Teaching' ? 'selected' : '' %>>Teaching</option>
+                                <option value="Speciality" <%= hospital && hospital.type === 'Speciality' ? 'selected' : '' %>>Speciality</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a hospital type.
+                            </div>
+                        </div>
+                        
+                        <!-- Hospital Address -->
+                        <div class="form-group">
+                            <label for="hospital_address">Address *</label>
+                            <textarea class="form-control" id="hospital_address" name="hospital[hospital_address]" rows="3" required><%= hospital ? hospital.hospital_address : '' %></textarea>
+                            <div class="invalid-feedback">
+                                Address is required.
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- City -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="city">City *</label>
+                                    <input type="text" class="form-control" id="city" name="city" value="<%= hospital ? hospital.city : '' %>" required>
+                                    <div class="invalid-feedback">
+                                        City is required.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- State -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="state">State *</label>
+                                    <input type="text" class="form-control" id="state" name="state" value="<%= hospital ? hospital.state : '' %>" required>
+                                    <div class="invalid-feedback">
+                                        State is required.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Zip Code -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="zip_code">Zip Code *</label>
+                                    <input type="text" class="form-control" id="zip_code" name="zip_code" value="<%= hospital ? hospital.zip_code : '' %>" required>
+                                    <div class="invalid-feedback">
+                                        Zip code is required.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <h5 class="mt-4 mb-3">Contact Information</h5>
+                        
+                        <div class="row">
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phone">Phone Number *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" value="<%= hospital ? hospital.phone : '' %>" required>
+                                    <div class="invalid-feedback">
+                                        Phone number is required.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Alternate Phone -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="alt_phone">Alternate Phone</label>
+                                    <input type="tel" class="form-control" id="alt_phone" name="alt_phone" value="<%= hospital ? hospital.alt_phone : '' %>">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Emergency Contact -->
+                        <div class="form-group">
+                            <label for="emergency_contact">Emergency Contact *</label>
+                            <input type="tel" class="form-control" id="emergency_contact" name="emergency_contact" value="<%= hospital ? hospital.emergency_contact : '' %>" required>
+                            <div class="invalid-feedback">
+                                Emergency contact is required.
+                            </div>
+                        </div>
+                        
+                        <!-- Website -->
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="url" class="form-control" id="website" name="website" value="<%= hospital ? hospital.website : '' %>">
+                        </div>
+                        
+                        <!-- Contact Number -->
+                        <div class="form-group">
+                            <label for="contact_no">Contact Number *</label>
+                            <input type="tel" class="form-control" id="contact_no" name="hospital[contact_no]" value="<%= hospital ? hospital.contact_no : '' %>" required>
+                            <div class="invalid-feedback">
+                                Contact number is required.
+                            </div>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" class="form-control" id="email" name="hospital[email]" value="<%= hospital ? hospital.email : '' %>" required>
+                            <div class="invalid-feedback">
+                                Email is required.
+                            </div>
+                        </div>
+                        
+                        <!-- Hospital Profile Image -->
+                        <div class="form-group">
+                            <label for="profile_image">Hospital Logo/Image</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                            <div class="form-text">Upload a hospital logo or image (optional)</div>
+                            <div id="imagePreviewContainer" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">Save Profile</button>
+                            <a href="/hospitals/profile/dashboard" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation script
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Image preview functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('profile_image');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    
+    if (imageInput && previewContainer) {
+        imageInput.addEventListener('change', function() {
+            previewContainer.innerHTML = '';
+            
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const preview = document.createElement('img');
+                    preview.classList.add('img-thumbnail', 'mt-2', 'mb-3');
+                    preview.style.maxHeight = '200px';
+                    preview.src = e.target.result;
+                    
+                    previewContainer.appendChild(preview);
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+
+<%- include('../layouts/footer') %> 

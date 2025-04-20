@@ -1,0 +1,321 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+            <p class="text-muted">Welcome to the blood bank management system.</p>
+        </div>
+    </div>
+
+    <!-- Critical Alerts -->
+    <% if (inventoryStats && inventoryStats.byBloodType) { %>
+        <% const criticalBloodTypes = inventoryStats.byBloodType.filter(s => s.total_units < 3) %>
+        <% if (criticalBloodTypes.length > 0) { %>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-left-danger shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                        Critical Blood Inventory Alert</div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                        The following blood types are at critical levels:
+                                        <% criticalBloodTypes.forEach((type, index) => { %>
+                                            <span class="badge badge-danger"><%= type.blood_type %></span>
+                                            <%= index < criticalBloodTypes.length - 1 ? ',' : '' %>
+                                        <% }) %>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="/admin/campaigns/new" class="btn btn-sm btn-danger">Schedule Blood Drive</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    <% } %>
+
+    <!-- Stats Cards -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Donors</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= donorCount %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="/admin/donors" class="btn btn-sm btn-primary">View Donors</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Hospitals</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= hospitalCount %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hospital fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="/admin/hospitals" class="btn btn-sm btn-success">View Hospitals</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Campaigns</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= campaignStats %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="/admin/campaigns" class="btn btn-sm btn-info">View Campaigns</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Requests</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= pendingDonations %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tasks fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="/admin/donation-requests" class="btn btn-sm btn-warning">View Requests</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blood Inventory Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Blood Inventory Summary</h6>
+                    <a href="/admin/inventory" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (inventoryStats && inventoryStats.byBloodType) { %>
+                        <div class="row">
+                            <% const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] %>
+                            <% bloodTypes.forEach(type => { %>
+                                <% const stat = inventoryStats.byBloodType.find(s => s.blood_type === type) || { total_units: 0 } %>
+                                <div class="col-xl-3 col-md-6 mb-4">
+                                    <div class="card border-left-danger h-100 py-2">
+                                        <div class="card-body">
+                                            <div class="row no-gutters align-items-center">
+                                                <div class="col-auto mr-2">
+                                                    <div class="text-xl font-weight-bold text-danger h2"><%= type %></div>
+                                                </div>
+                                                <div class="col text-right">
+                                                    <div class="h5 mb-0 font-weight-bold text-gray-800"><%= stat.total_units %> units</div>
+                                                    <% if (stat.total_units < 3) { %>
+                                                        <span class="badge badge-danger mt-2">Critical</span>
+                                                    <% } else if (stat.total_units < 5) { %>
+                                                        <span class="badge badge-warning mt-2">Low</span>
+                                                    <% } else if (stat.total_units < 10) { %>
+                                                        <span class="badge badge-info mt-2">Moderate</span>
+                                                    <% } else { %>
+                                                        <span class="badge badge-success mt-2">Good</span>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No inventory data available.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Donation Requests -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Donation Requests</h6>
+                    <a href="/admin/donation-requests" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (recentDonations && recentDonations.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Donor</th>
+                                        <th>Blood Type</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentDonations.forEach(donation => { %>
+                                        <tr>
+                                            <td><%= donation.donor_name %></td>
+                                            <td><span class="badge badge-danger"><%= donation.blood_type %></span></td>
+                                            <td><%= new Date(donation.donation_date).toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge badge-<%= 
+                                                    donation.status === 'completed' ? 'success' : 
+                                                    (donation.status === 'rejected' ? 'danger' : 'warning') 
+                                                %>">
+                                                    <%= donation.status %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No recent donation requests available.
+                        </div>
+                    <% } %>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-circle me-2"></i> You have <%= pendingDonations %> pending donation requests.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Requests -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Blood Requests</h6>
+                    <a href="/admin/blood-requests" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    <% if (recentBloodRequests && recentBloodRequests.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Hospital</th>
+                                        <th>Blood Type</th>
+                                        <th>Required Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentBloodRequests.forEach(request => { %>
+                                        <tr>
+                                            <td><%= request.hospital_name %></td>
+                                            <td><span class="badge badge-danger"><%= request.blood_type %></span></td>
+                                            <td><%= new Date(request.required_date).toLocaleDateString() %></td>
+                                            <td>
+                                                <span class="badge badge-<%= 
+                                                    request.status === 'approved' ? 'success' : 
+                                                    (request.status === 'rejected' ? 'danger' : 'warning') 
+                                                %>">
+                                                    <%= request.status %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No recent blood requests available.
+                        </div>
+                    <% } %>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-circle me-2"></i> You have <%= pendingRequests %> pending blood requests.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Statistics -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">System Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Total Blood Units</h5>
+                                    <p class="display-4">
+                                        <%= inventoryStats && inventoryStats.totals ? inventoryStats.totals.total_units : 0 %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Total Volume (ml)</h5>
+                                    <p class="display-4">
+                                        <%= inventoryStats && inventoryStats.totals ? inventoryStats.totals.total_volume : 0 %>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light mb-3">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">Active Campaigns</h5>
+                                    <p class="display-4"><%= campaignStats %></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,95 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-heartbeat me-2"></i>
+            Blood Bank Management
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <% if(currentUser) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/campaigns"><i class="fas fa-calendar-alt"></i> Campaigns</a>
+                    </li> -->
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> About</a>
+                    </li> -->
+                <% } %>
+            </ul>
+            <ul class="navbar-nav">
+                <% if(currentUser) { %>
+                    <% if(currentUser.role === 'admin') { %>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
+                        </li> -->
+                         <li class="nav-item">
+                            <a class="nav-link" href="/campaigns"><i class="fas fa-calendar-alt"></i> Campaigns</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/staff"><i class="fas fa-users"></i> Staff</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/inventory"><i class="fas fa-box"></i> Inventory</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/donors"><i class="fas fa-users"></i> Donors</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/hospitals"><i class="fas fa-hospital"></i> Hospitals</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/donationrequests"><i class="fas fa-hand-holding-medical"></i> Donation Requests</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/bloodrequests"><i class="fas fa-tint"></i> Blood Requests</a>
+                        </li>
+                    <% } else if(currentUser.role === 'donor') { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/donors/profile/dashboard"><i class="fas fa-tachometer-alt"></i> Donor Dashboard</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="/donors/profile"><i class="fas fa-user"></i> My Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/donors/donation/request"><i class="fas fa-hand-holding-medical"></i> Donate</a>
+                        </li> -->
+                    <% } else if(currentUser.role === 'hospital') { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/hospitals/profile/dashboard"><i class="fas fa-hospital"></i> Hospital Dashboard</a>
+                        </li>
+                        <!-- <li class="nav-item">
+                            <a class="nav-link" href="/hospitals/request/new"><i class="fas fa-tint"></i> Request Blood</a>
+                        </li> -->
+                    <% } else if(currentUser.role === 'staff') { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/dashboard"><i class="fas fa-clipboard-list"></i> Staff Dashboard</a>
+                        </li>
+                    <% } %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle"></i> <%= currentUser.username %>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <!-- <li><a class="dropdown-item" href="/profile"><i class="fas fa-id-card"></i> Profile</a></li> -->
+                            <!-- <li><hr class="dropdown-divider"></li> -->
+                            <li><a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/register"><i class="fas fa-user-plus"></i> Register</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>

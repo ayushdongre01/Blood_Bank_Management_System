@@ -1,0 +1,298 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container my-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/bloodrequests" class="text-dark" style="text-decoration: none;">Blood Requests</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Request Details</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Blood Request</h2>
+            <div>
+                <span class="badge <%= 
+                    request.request_status === 'pending' ? 'bg-warning' : 
+                    request.request_status === 'approved' ? 'bg-success' : 
+                    request.request_status === 'fulfilled' ? 'bg-info' : 
+                    request.request_status === 'rejected' ? 'bg-danger' :
+                    'bg-secondary' 
+                %>">
+                    <%= request.request_status.charAt(0).toUpperCase() + request.request_status.slice(1) %>
+                </span>
+                <% if (request.priority) { %>
+                    <span class="badge <%= 
+                        request.priority === 'Emergency' ? 'bg-danger' : 
+                        request.priority === 'Urgent' ? 'bg-warning' : 
+                        request.priority === 'High' ? 'bg-info' : 
+                        'bg-secondary' 
+                    %> ms-2">
+                        <%= request.priority %>
+                    </span>
+                <% } %>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- Blood Request Details -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="border-bottom pb-2 mb-3">Request Information</h4>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>Blood Type:</strong>
+                        <span class="badge rounded-pill bg-danger"><%= request.blood_type %></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Component:</strong> <%= request.component || 'Whole Blood' %>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Quantity:</strong> <%= request.amount_required || request.quantity_ml %> ml
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>Request Date:</strong> <%= new Date(request.request_date || request.created_at).toLocaleDateString() %>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Required By:</strong> <%= new Date(request.required_date).toLocaleDateString() %>
+                    </div>
+                    <% if (request.priority) { %>
+                        <div class="mb-3">
+                            <strong>Priority Level:</strong> 
+                            <span class="badge <%= 
+                                request.priority === 'Emergency' ? 'bg-danger' : 
+                                request.priority === 'Urgent' ? 'bg-warning' : 
+                                request.priority === 'High' ? 'bg-info' : 
+                                'bg-secondary' 
+                            %>">
+                                <%= request.priority %>
+                            </span>
+                        </div>
+                    <% } %>
+                    <div class="mb-3">
+                        <strong>Status:</strong> 
+                        <span class="badge <%= 
+                            request.request_status === 'pending' ? 'bg-warning' : 
+                            request.request_status === 'approved' ? 'bg-success' : 
+                            request.request_status === 'fulfilled' ? 'bg-info' : 
+                            request.request_status === 'rejected' ? 'bg-danger' :
+                            'bg-secondary' 
+                        %>">
+                            <%= request.request_status.charAt(0).toUpperCase() + request.request_status.slice(1) %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hospital Details -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="border-bottom pb-2 mb-3">Hospital Information</h4>
+                </div>
+                <div class="col-md-6">
+                    <!-- <div class="mb-3">
+                        <strong>Hospital ID:</strong> <%= request.hospital_id %>
+                    </div> -->
+                    <div class="mb-3">
+                        <strong>Hospital Name:</strong> <%= request.hospital_name %>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Hospital Address:</strong> <%= request.hospital_address || 'Not available' %>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <strong>Contact Number:</strong> <%= request.hospital_contact || 'Not available' %>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> <%= request.hospital_email || 'Not available' %>
+                    </div>
+                    <% if (typeof request.hospital_registration_no !== 'undefined' && request.hospital_registration_no) { %>
+                        <div class="mb-3">
+                            <strong>Registration No:</strong> <%= request.hospital_registration_no %>
+                        </div>
+                    <% } %>
+                    <% if (typeof request.hospital_website !== 'undefined' && request.hospital_website) { %>
+                        <div class="mb-3">
+                            <strong>Website:</strong> 
+                            <a href="<%= request.hospital_website %>" target="_blank"><%= request.hospital_website %></a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Recipient Details -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4 class="border-bottom pb-2 mb-3">Recipient Information</h4>
+                </div>
+                
+                <% if (request.recipient_id || request.recipient_name) { %>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong>Recipient Name:</strong> <%= request.recipient_name %>
+                            <!-- <% if (request.recipient_id) { %>
+                                <small class="text-muted">(ID: <%= request.recipient_id %>)</small>
+                            <% } %> -->
+                        </div>
+                        <div class="mb-3">
+                            <strong>Blood Type:</strong> 
+                            <span class="badge rounded-pill bg-danger"><%= request.recipient_blood_type || request.blood_type %></span>
+                        </div>
+                        <% if (request.recipient_gender) { %>
+                            <div class="mb-3">
+                                <strong>Gender:</strong> <%= request.recipient_gender %>
+                            </div>
+                        <% } %>
+                        <% if (request.recipient_date_of_birth) { %>
+                            <div class="mb-3">
+                                <strong>Date of Birth:</strong> <%= new Date(request.recipient_date_of_birth).toLocaleDateString() %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <% if (request.recipient_contact_no) { %>
+                            <div class="mb-3">
+                                <strong>Contact:</strong> <%= request.recipient_contact_no %>
+                            </div>
+                        <% } %>
+                        <% if (request.recipient_email) { %>
+                            <div class="mb-3">
+                                <strong>Email:</strong> <%= request.recipient_email %>
+                            </div>
+                        <% } %>
+                        <% if (request.recipient_address) { %>
+                            <div class="mb-3">
+                                <strong>Address:</strong> <%= request.recipient_address %>
+                            </div>
+                        <% } %>
+                        <% if (request.recipient_type) { %>
+                            <div class="mb-3">
+                                <strong>Recipient Type:</strong> 
+                                <span class="badge bg-info">
+                                    <%= request.recipient_type %>
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <% if (request.recipient_medical_history) { %>
+                        <div class="col-12 mt-3">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="card-title">Medical History</h5>
+                                    <p class="card-text" style="white-space: pre-line;"><%= request.recipient_medical_history %></p>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> This is a general blood request without a specific recipient.
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Notes -->
+            <% if (request.notes || request.additional_notes) { %>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="border-bottom pb-2 mb-3">Additional Information</h4>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">Notes</h5>
+                                <p class="card-text" style="white-space: pre-line;"><%= request.notes || request.additional_notes %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Actions -->
+            <div class="mt-4 d-flex justify-content-end">
+                <% if (isAdmin && request.request_status === 'pending') { %>
+                    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#approveModal">
+                        <i class="fas fa-check"></i> Approve
+                    </button>
+                    <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="fas fa-times"></i> Reject
+                    </button>
+                <% } %>
+                
+                <% if (isAdmin && request.request_status === 'approved') { %>
+                    <!-- <form action="/bloodrequests/<%= request.request_id %>/fulfill" method="POST" class="d-inline me-2">
+                        <button type="submit" class="btn btn-primary" onclick="return confirm('Mark this request as fulfilled?')">
+                            <i class="fas fa-check-double"></i> Mark as Fulfilled
+                        </button>
+                    </form> -->
+                <% } %>
+                
+                <% if (isOwner && request.request_status === 'pending') { %>
+                    <form action="/bloodrequests/<%= request.request_id %>/cancel" method="POST" class="d-inline me-2">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this request?')">
+                            <i class="fas fa-ban"></i> Cancel Request
+                        </button>
+                    </form>
+                <% } %>
+                
+                <a href="/bloodrequests" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Requests
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (isAdmin && request.request_status === 'pending') { %>
+    <!-- Approve Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveModalLabel">Approve Blood Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/bloodrequests/<%= request.request_id %>/approve" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="approval_reason" class="form-label">Approval Reason (Optional)</label>
+                            <textarea class="form-control" id="approval_reason" name="approval_reason" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reject Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Blood Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/bloodrequests/<%= request.request_id %>/reject" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rejection_reason" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<% } %> 

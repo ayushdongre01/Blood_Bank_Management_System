@@ -1,0 +1,194 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-hospital"></i> Hospitals Management</h2>
+        <div>
+            <a href="/admin/hospitals/new" class="btn btn-success">
+                <i class="fas fa-plus"></i> Add New Hospital
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-white">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">All Hospitals</h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="hospitalSearch" class="form-control" placeholder="Search hospitals...">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <% if (hospitals && hospitals.length) { %>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="hospitalsTable">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Location</th>
+                                <th scope="col">Contact</th>
+                                <th scope="col" class="text-center">Status</th>
+                                <th scope="col" class="text-center">Blood Inventory</th>
+                                <th scope="col" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% hospitals.forEach(hospital => { %>
+                                <tr>
+                                    <td>
+                                        <strong><%= hospital.name %></strong>
+                                    </td>
+                                    <td>
+                                        <% if (hospital.type) { %>
+                                            <span class="badge bg-info text-dark">
+                                                <%= hospital.type.charAt(0).toUpperCase() + hospital.type.slice(1) %>
+                                            </span>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">Not specified</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%= hospital.city %>, <%= hospital.state %>
+                                    </td>
+                                    <td>
+                                        <% if (hospital.phone) { %>
+                                            <i class="fas fa-phone-alt text-muted me-1"></i> <%= hospital.phone %><br>
+                                        <% } %>
+                                        <% if (hospital.email) { %>
+                                            <small><i class="fas fa-envelope text-muted me-1"></i> <%= hospital.email %></small>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-center">
+                                        <% if (hospital.isActive) { %>
+                                            <span class="badge bg-success">Active</span>
+                                        <% } else { %>
+                                            <span class="badge bg-danger">Inactive</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-center">
+                                        <% if (hospital.hasInventory) { %>
+                                            <a href="/admin/hospitals/<%= hospital._id %>/inventory" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-tint"></i> View
+                                            </a>
+                                        <% } else { %>
+                                            <a href="/admin/hospitals/<%= hospital._id %>/inventory/setup" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-plus-circle"></i> Setup
+                                            </a>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a href="/admin/hospitals/<%= hospital._id %>" class="btn btn-sm btn-outline-info" title="View Details">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="/admin/hospitals/<%= hospital._id %>/edit" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    data-hospital-id="<%= hospital._id %>" 
+                                                    data-hospital-name="<%= hospital.name %>"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteHospitalModal" 
+                                                    title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <% if (hospitals.length > 10) { %>
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav aria-label="Hospital pagination">
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No hospitals found. Get started by adding your first hospital!
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Hospital Modal -->
+<div class="modal fade" id="deleteHospitalModal" tabindex="-1" aria-labelledby="deleteHospitalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteHospitalModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="hospitalNameToDelete"></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone. All associated data, including blood inventory and request history, will be permanently deleted.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteHospitalForm" action="/admin/hospitals/:id?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Hospital</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup delete hospital modal
+        const deleteModal = document.getElementById('deleteHospitalModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const hospitalId = button.getAttribute('data-hospital-id');
+                const hospitalName = button.getAttribute('data-hospital-name');
+                
+                document.getElementById('hospitalNameToDelete').textContent = hospitalName;
+                document.getElementById('deleteHospitalForm').action = `/admin/hospitals/${hospitalId}?_method=DELETE`;
+            });
+        }
+        
+        // Hospital search functionality
+        const searchInput = document.getElementById('hospitalSearch');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchValue = this.value.toLowerCase();
+                const table = document.getElementById('hospitalsTable');
+                const rows = table.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    if (text.includes(searchValue)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script> 

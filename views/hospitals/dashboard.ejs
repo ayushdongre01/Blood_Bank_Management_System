@@ -1,0 +1,266 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <h1 class="mb-4">Hospital Dashboard</h1>
+    
+    <div class="row">
+        <!-- Blood Requests Summary -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-primary shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                 Blood Requests</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/hospitals/requests" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Recipients Summary -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-success shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Recipients</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= totalRecipients %></div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="/hospitals/recipients" class="btn btn-sm btn-success">View All</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hospital Profile Info -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-left-info shadow h-100">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col-md-4 text-center">
+                            <% if (hospital.profile_image) { %>
+                                <img src="<%= hospital.profile_image %>" alt="Hospital Logo" class="img-fluid rounded-circle mb-2" style="max-width: 100%; max-height: 80px; object-fit: cover;">
+                            <% } else { %>
+                                <i class="fas fa-hospital fa-3x text-gray-300 mb-2"></i>
+                            <% } %>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Hospital Profile</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800"><%= hospital.hospital_name %></div>
+                            <div class="small text-muted"><%= hospital.hospital_address %></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="card-footer">
+                    <a href="/hospitals/profile/edit" class="btn btn-sm btn-info">Edit Profile</a>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Blood Inventory Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Blood Inventory Status</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Blood Type</th>
+                                    <th>Available Units</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% bloodInventory.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.blood_type %></td>
+                                    <td><%= item.units %></td>
+                                    <td>
+                                        <% 
+                                        let statusClass;
+                                        if (item.status) {
+                                            const status = item.status.toLowerCase();
+                                            if (status === 'available') statusClass = 'success';
+                                            else if (status === 'moderate') statusClass = 'info';
+                                            else if (status === 'low') statusClass = 'warning';
+                                            else if (status === 'critical') statusClass = 'danger';
+                                            else statusClass = 'secondary';
+                                        } else {
+                                            statusClass = 'secondary';
+                                        }
+                                        %>
+                                        <span class="badge badge-<%= statusClass %> text-dark"><%= item.status || 'Unknown' %></span>
+                                    </td>
+                                    <td>
+                                        <a href="/hospitals/request/new?blood_type=<%= item.blood_type %>" class="btn btn-sm btn-primary">Request</a>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Request Blood -->
+                        <div class="col-md-6 col-sm-6 mb-4">
+                            <div class="card h-100 border-left-danger">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tint fa-3x text-danger mb-3"></i>
+                                    <h5>Request Blood</h5>
+                                    <p class="small text-muted">Submit requests for needed blood types</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="/hospitals/request/new" class="btn btn-danger">Request Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Organize Campaign -->
+                        <div class="col-md-6 col-sm-6 mb-4">
+                            <div class="card h-100 border-left-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
+                                    <h5>Campaigns</h5>
+                                    <!-- <p class="small text-muted">Schedule a blood donation drive</p> -->
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="/campaigns" class="btn btn-primary">View Campaigns</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Add Recipient
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="card h-100 border-left-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-plus fa-3x text-success mb-3"></i>
+                                    <h5>Add Recipient</h5>
+                                    <p class="small text-muted">Register a new blood recipient</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="/hospitals/recipient/new" class="btn btn-success">Add Now</a>
+                                </div>
+                            </div>
+                        </div> -->
+                        
+                        <!-- View Inventory
+                        <div class="col-md-3 col-sm-6 mb-4">
+                            <div class="card h-100 border-left-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-warehouse fa-3x text-info mb-3"></i>
+                                    <h5>Blood Inventory</h5>
+                                    <p class="small text-muted">Manage your blood inventory</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0 text-center">
+                                    <a href="/blood-inventory" class="btn btn-info">View Inventory</a>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Blood Requests -->
+    <!-- <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Blood Requests</h6>
+                </div>
+                <div class="card-body">
+                    <% if (recentRequests.length === 0) { %>
+                        <p class="text-center">No recent blood requests</p>
+                    <% } else { %>
+                        <div class="list-group">
+                            <% recentRequests.forEach(request => { %>
+                                <a href="/hospitals/request/<%= request.request_id %>" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1"><%= request.blood_type %> (<%= request.units %> units)</h6>
+                                        <small><%= new Date(request.request_date).toLocaleDateString() %></small>
+                                    </div>
+                                    <p class="mb-1">Status: <span class="badge badge-<%= request.status === 'pending' ? 'warning' : (request.status === 'approved' ? 'success' : 'danger') %>"><%= request.status %></span></p>
+                                </a>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="card-footer">
+                    <a href="/hospitals/request/new" class="btn btn-primary">New Request</a>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Recent Recipients -->
+        <!-- <div class="container">
+            <div class="row justify-content-center">
+              <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-success">Recent Recipients</h6>
+                </div>
+                <div class="card-body">
+                    <% if (recentRecipients.length === 0) { %>
+                        <p class="text-center">No recipients added recently</p>
+                    <% } else { %>
+                        <div class="list-group">
+                            <% recentRecipients.forEach(recipient => { %>
+                                
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1"><%= recipient.name %></h6>
+                                        <small>Blood Type: <%= recipient.blood_type %></small>
+                                    </div>
+                                    <p class="mb-1"><%= recipient.contact_number %></p>
+                                    <br>
+                                
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="card-footer">
+                    <a href="/hospitals/recipient/new" class="btn btn-success">Add Recipient</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div> -->
+<script>
+    // Any dashboard specific JavaScript can go here
+</script> 

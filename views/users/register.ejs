@@ -1,0 +1,344 @@
+<%- layout('layouts/boilerplate') %>
+<% const title = 'Register' %>
+
+<div class="auth-form bg-white">
+    <h2 class="text-center text-danger mb-4">Register</h2>
+    
+    <ul class="nav nav-tabs mb-4" id="registerTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="donor-tab" data-bs-toggle="tab" data-bs-target="#donor-form" type="button" role="tab" aria-controls="donor-form" aria-selected="true">
+                <i class="fas fa-user me-2"></i>Donor
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="hospital-tab" data-bs-toggle="tab" data-bs-target="#hospital-form" type="button" role="tab" aria-controls="hospital-form" aria-selected="false">
+                <i class="fas fa-hospital me-2"></i>Hospital
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="registerTabContent">
+        <!-- Donor Registration Form -->
+        <div class="tab-pane fade show active" id="donor-form" role="tabpanel" aria-labelledby="donor-tab">
+            <form action="/register" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+                <input type="hidden" name="role" value="donor">
+                
+                <!-- User Authentication Fields -->
+                <h5 class="mb-3 text-danger">Account Information</h5>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                    <div class="invalid-feedback">
+                        Please choose a username.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">
+                            Please provide a password.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#confirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">
+                            Passwords do not match.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Donor Profile Fields -->
+                <h5 class="mb-3 mt-4 text-danger">Personal Information</h5>
+                <div class="mb-3">
+                    <label for="donorName" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="donorName" name="name" required>
+                    <div class="invalid-feedback">
+                        Please provide your full name.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="donorEmail" name="email" required>
+                    <div class="invalid-feedback">
+                        Please provide a valid email.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorGender" class="form-label">Gender</label>
+                    <select class="form-select" id="donorGender" name="gender" required>
+                        <option value="" selected disabled>Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select your gender.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorDOB" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="donorDOB" name="date_of_birth" required>
+                    <div class="invalid-feedback">
+                        Please provide your date of birth.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorBloodType" class="form-label">Blood Type</label>
+                    <select class="form-select" id="donorBloodType" name="blood_type" required>
+                        <option value="" selected disabled>Select blood type</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Please select your blood type.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorContact" class="form-label">Contact Number</label>
+                    <input type="tel" class="form-control" id="donorContact" name="contact_no" required>
+                    <div class="invalid-feedback">
+                        Please provide your contact number.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorAddress" class="form-label">Address</label>
+                    <textarea class="form-control" id="donorAddress" name="address" rows="3" required></textarea>
+                    <div class="invalid-feedback">
+                        Please provide your address.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="donorProfileImage" class="form-label">Profile Image</label>
+                    <input type="file" class="form-control" id="donorProfileImage" name="profile_image" accept="image/*">
+                    <div class="form-text">Upload a profile image (optional)</div>
+                    <div id="donorImagePreviewContainer" class="mt-2"></div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheckDonor" required>
+                    <label class="form-check-label" for="termsCheckDonor">
+                        I agree to the <a href="#" target="_blank" style="text-decoration: none;">Terms and Conditions</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-danger">Register as Donor</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Hospital Registration Form -->
+        <div class="tab-pane fade" id="hospital-form" role="tabpanel" aria-labelledby="hospital-tab">
+            <form action="/register" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+                <input type="hidden" name="role" value="hospital">
+                
+                <!-- User Authentication Fields -->
+                <h5 class="mb-3 text-danger">Account Information</h5>
+                <div class="mb-3">
+                    <label for="hospitalUsername" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="hospitalUsername" name="username" required>
+                    <div class="invalid-feedback">
+                        Please choose a username.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalPassword" class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="hospitalPassword" name="password" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#hospitalPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">
+                            Please provide a password.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalConfirmPassword" class="form-label">Confirm Password</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="hospitalConfirmPassword" required>
+                        <button class="btn btn-outline-secondary toggle-password" type="button" data-target="#hospitalConfirmPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">
+                            Passwords do not match.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hospital Profile Fields -->
+                <h5 class="mb-3 mt-4 text-danger">Hospital Information</h5>
+                <div class="mb-3">
+                    <label for="hospitalName" class="form-label">Hospital Name</label>
+                    <input type="text" class="form-control" id="hospitalName" name="hospital_name" required>
+                    <div class="invalid-feedback">
+                        Please provide the hospital name.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="hospitalEmail" name="email" required>
+                    <div class="invalid-feedback">
+                        Please provide a valid email.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalContact" class="form-label">Contact Number</label>
+                    <input type="tel" class="form-control" id="hospitalContact" name="contact_no" required>
+                    <div class="invalid-feedback">
+                        Please provide a contact number.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalAddress" class="form-label">Hospital Address</label>
+                    <textarea class="form-control" id="hospitalAddress" name="hospital_address" rows="3" required></textarea>
+                    <div class="invalid-feedback">
+                        Please provide the hospital address.
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="hospitalProfileImage" class="form-label">Hospital Logo/Image</label>
+                    <input type="file" class="form-control" id="hospitalProfileImage" name="profile_image" accept="image/*">
+                    <div class="form-text">Upload a hospital logo or image (optional)</div>
+                    <div id="hospitalImagePreviewContainer" class="mt-2"></div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheckHospital" required>
+                    <label class="form-check-label" for="termsCheckHospital">
+                        I agree to the <a href="#" target="_blank" style="text-decoration: none;">Terms and Conditions</a>
+                    </label>
+                    <div class="invalid-feedback">
+                        You must agree before submitting.
+                    </div>
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-danger">Register as Hospital</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="mt-4 text-center">
+        <p>Already have an account? <a href="/login" class="text-danger" style="text-decoration: none;">Login</a></p>
+    </div>
+</div>
+
+<script>
+    // Validate confirm password
+    document.addEventListener('DOMContentLoaded', function() {
+        const donorForm = document.querySelector('#donor-form form');
+        const hospitalForm = document.querySelector('#hospital-form form');
+        
+        donorForm.addEventListener('submit', function(event) {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match');
+                event.preventDefault();
+                event.stopPropagation();
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        });
+        
+        hospitalForm.addEventListener('submit', function(event) {
+            const password = document.getElementById('hospitalPassword');
+            const confirmPassword = document.getElementById('hospitalConfirmPassword');
+            
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.setCustomValidity('Passwords do not match');
+                event.preventDefault();
+                event.stopPropagation();
+            } else {
+                confirmPassword.setCustomValidity('');
+            }
+        });
+        
+        // Image preview functionality
+        const donorImageInput = document.getElementById('donorProfileImage');
+        const donorPreviewContainer = document.getElementById('donorImagePreviewContainer');
+        
+        if (donorImageInput && donorPreviewContainer) {
+            donorImageInput.addEventListener('change', function() {
+                donorPreviewContainer.innerHTML = '';
+                
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const preview = document.createElement('img');
+                        preview.classList.add('img-thumbnail', 'mt-2', 'mb-3');
+                        preview.style.maxHeight = '200px';
+                        preview.src = e.target.result;
+                        
+                        donorPreviewContainer.appendChild(preview);
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+        
+        const hospitalImageInput = document.getElementById('hospitalProfileImage');
+        const hospitalPreviewContainer = document.getElementById('hospitalImagePreviewContainer');
+        
+        if (hospitalImageInput && hospitalPreviewContainer) {
+            hospitalImageInput.addEventListener('change', function() {
+                hospitalPreviewContainer.innerHTML = '';
+                
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const preview = document.createElement('img');
+                        preview.classList.add('img-thumbnail', 'mt-2', 'mb-3');
+                        preview.style.maxHeight = '200px';
+                        preview.src = e.target.result;
+                        
+                        hospitalPreviewContainer.appendChild(preview);
+                    }
+                    
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+

@@ -1,0 +1,67 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container mt-4 mb-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Ongoing Blood Donation Campaigns</h1>
+            <p class="lead">Current active campaigns where you can donate blood today.</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="/campaigns" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-1"></i> All Campaigns
+            </a>
+        </div>
+    </div>
+    
+    <!-- Ongoing Campaigns List -->
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">
+                <i class="fas fa-heartbeat mr-2"></i> Ongoing Campaigns
+                <span class="badge badge-light ml-2"><%= campaigns.length %></span>
+            </h4>
+        </div>
+        <div class="card-body">
+            <% if (campaigns.length > 0) { %>
+                <div class="row">
+                    <% campaigns.forEach(campaign => { %>
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 campaign-card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><%= campaign.name %></h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Location:</strong> <%= campaign.location %></p>
+                                    <p><strong>Dates:</strong> <%= new Date(campaign.start_date).toLocaleDateString() %> - <%= new Date(campaign.end_date).toLocaleDateString() %></p>
+                                    <p><strong>Organizer:</strong> <%= campaign.organizer %></p>
+                                    <% if (campaign.description) { %>
+                                        <p class="card-text"><%= campaign.description.substring(0, 100) %><%= campaign.description.length > 100 ? '...' : '' %></p>
+                                    <% } %>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="/campaigns/<%= campaign.campaign_id %>" class="btn btn-outline-success btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle mr-2"></i> There are no ongoing campaigns at the moment.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<style>
+.campaign-card {
+    transition: transform 0.3s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.campaign-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+</style> 

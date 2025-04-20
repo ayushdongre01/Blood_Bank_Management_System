@@ -1,0 +1,467 @@
+<%- include('../layouts/boilerplate') %>
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Blood Inventory Management</h1>
+        </div>
+        <div class="col-md-4 text-right">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addInventoryModal">
+                <i class="fas fa-plus"></i> Add Inventory
+            </button>
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Inventory Summary -->
+    <div class="row mb-4">
+        <% const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']; %>
+        <% bloodTypes.forEach(bloodType => { %>
+            <% const inventory = bloodInventory.find(item => item.blood_type === bloodType) || { units: 0 }; %>
+            <div class="col-md-3 mb-4">
+                <div class="card shadow h-100">
+                    <div class="card-header py-3 bg-<%= 
+                        inventory.units < 3 ? 'danger' : 
+                        (inventory.units < 5 ? 'warning' : 
+                        (inventory.units < 10 ? 'info' : 'success')) 
+                    %> text-white">
+                        <h6 class="m-0 font-weight-bold"><%= bloodType %></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                    Available Units</div>
+                                <div class="h1 mb-0 font-weight-bold"><%= inventory.units %></div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-tint fa-3x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <% if (inventory.units < 3) { %>
+                                <span class="badge badge-danger">Critical</span>
+                                <div class="small text-danger mt-1">
+                                    <i class="fas fa-exclamation-triangle"></i> Critical level! Request donations immediately.
+                                </div>
+                            <% } else if (inventory.units < 5) { %>
+                                <span class="badge badge-warning">Low</span>
+                                <div class="small text-warning mt-1">
+                                    <i class="fas fa-exclamation-circle"></i> Low levels! Consider requesting donations.
+                                </div>
+                            <% } else if (inventory.units < 10) { %>
+                                <span class="badge badge-info">Moderate</span>
+                                <div class="small text-info mt-1">
+                                    <i class="fas fa-info-circle"></i> Moderate levels. Monitor closely.
+                                </div>
+                            <% } else { %>
+                                <span class="badge badge-success">Good</span>
+                                <div class="small text-success mt-1">
+                                    <i class="fas fa-check-circle"></i> Healthy inventory levels.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Inventory</h6>
+        </div>
+        <div class="card-body">
+            <form action="/admin/inventory" method="GET" class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="bloodType">Blood Type</label>
+                    <select class="form-control" id="bloodType" name="bloodType">
+                        <option value="">All</option>
+                        <% bloodTypes.forEach(type => { %>
+                            <option value="<%= type %>" <%= filter && filter.bloodType === type ? 'selected' : '' %>><%= type %></option>
+                        <% }); %>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="">All</option>
+                        <option value="available" <%= filter && filter.status === 'available' ? 'selected' : '' %>>Available</option>
+                        <option value="reserved" <%= filter && filter.status === 'reserved' ? 'selected' : '' %>>Reserved</option>
+                        <option value="expired" <%= filter && filter.status === 'expired' ? 'selected' : '' %>>Expired</option>
+                        <option value="critical" <%= filter && filter.status === 'critical' ? 'selected' : '' %>>Critical (< 3 units)</option>
+                        <option value="low" <%= filter && filter.status === 'low' ? 'selected' : '' %>>Low (< 5 units)</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="expiryDateFrom">Expiry From</label>
+                    <input type="date" class="form-control" id="expiryDateFrom" name="expiryDateFrom" value="<%= filter && filter.expiryDateFrom ? filter.expiryDateFrom : '' %>">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="expiryDateTo">Expiry To</label>
+                    <input type="date" class="form-control" id="expiryDateTo" name="expiryDateTo" value="<%= filter && filter.expiryDateTo ? filter.expiryDateTo : '' %>">
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="/admin/inventory" class="btn btn-secondary">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Inventory Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Blood Inventory Details</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="inventoryTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Blood Type</th>
+                            <th>Units</th>
+                            <th>Status</th>
+                            <th>Donation Date</th>
+                            <th>Expiry Date</th>
+                            <th>Donor</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% inventoryItems.forEach(item => { %>
+                            <tr class="<%= 
+                                new Date(item.expiry_date) < new Date() ? 'table-danger' : 
+                                (new Date(item.expiry_date) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) ? 'table-warning' : '') 
+                            %>">
+                                <td><%= item.inventory_id %></td>
+                                <td><%= item.blood_type %></td>
+                                <td><%= item.units %></td>
+                                <td>
+                                    <% if (new Date(item.expiry_date) < new Date()) { %>
+                                        <span class="badge badge-danger">Expired</span>
+                                    <% } else if (item.status === 'reserved') { %>
+                                        <span class="badge badge-warning">Reserved</span>
+                                    <% } else { %>
+                                        <span class="badge badge-success">Available</span>
+                                    <% } %>
+                                </td>
+                                <td><%= new Date(item.donation_date).toLocaleDateString() %></td>
+                                <td>
+                                    <%= new Date(item.expiry_date).toLocaleDateString() %>
+                                    <% if (new Date(item.expiry_date) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && new Date(item.expiry_date) >= new Date()) { %>
+                                        <i class="fas fa-exclamation-triangle text-warning" data-toggle="tooltip" title="Expires soon"></i>
+                                    <% } else if (new Date(item.expiry_date) < new Date()) { %>
+                                        <i class="fas fa-times-circle text-danger" data-toggle="tooltip" title="Expired"></i>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (item.donor_id) { %>
+                                        <a href="/admin/donors/<%= item.donor_id %>"><%= item.donor_name || 'Donor #' + item.donor_id %></a>
+                                    <% } else { %>
+                                        <span class="text-muted">External Source</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-primary" 
+                                                data-toggle="modal" 
+                                                data-target="#editInventoryModal" 
+                                                data-id="<%= item.inventory_id %>"
+                                                data-blood-type="<%= item.blood_type %>"
+                                                data-units="<%= item.units %>"
+                                                data-status="<%= item.status %>"
+                                                data-expiry-date="<%= item.expiry_date.toISOString().split('T')[0] %>">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" 
+                                                data-toggle="modal" 
+                                                data-target="#deleteInventoryModal"
+                                                data-id="<%= item.inventory_id %>"
+                                                data-blood-type="<%= item.blood_type %>"
+                                                data-units="<%= item.units %>">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <% if (totalPages > 1) { %>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                            <a class="page-link" href="/admin/inventory?page=<%= currentPage - 1 %><%= filterQueryString %>" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                <a class="page-link" href="/admin/inventory?page=<%= i %><%= filterQueryString %>"><%= i %></a>
+                            </li>
+                        <% } %>
+                        <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                            <a class="page-link" href="/admin/inventory?page=<%= currentPage + 1 %><%= filterQueryString %>" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Expiring Inventory Alert -->
+    <% if (expiringItems.length > 0) { %>
+        <div class="card shadow mb-4 border-left-warning">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-warning">Expiring Inventory Alert</h6>
+            </div>
+            <div class="card-body">
+                <p>The following inventory items are expiring within the next 7 days:</p>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Blood Type</th>
+                                <th>Units</th>
+                                <th>Expiry Date</th>
+                                <th>Days Left</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% expiringItems.forEach(item => { %>
+                                <tr>
+                                    <td><%= item.inventory_id %></td>
+                                    <td><%= item.blood_type %></td>
+                                    <td><%= item.units %></td>
+                                    <td><%= new Date(item.expiry_date).toLocaleDateString() %></td>
+                                    <td>
+                                        <% const daysLeft = Math.ceil((new Date(item.expiry_date) - new Date()) / (24 * 60 * 60 * 1000)); %>
+                                        <span class="badge badge-<%= daysLeft <= 2 ? 'danger' : 'warning' %>">
+                                            <%= daysLeft %> day<%= daysLeft !== 1 ? 's' : '' %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<!-- Add Inventory Modal -->
+<div class="modal fade" id="addInventoryModal" tabindex="-1" role="dialog" aria-labelledby="addInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addInventoryModalLabel">Add Blood Inventory</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/admin/inventory" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="blood_type">Blood Type *</label>
+                        <select class="form-control" id="blood_type" name="blood_type" required>
+                            <option value="" disabled selected>Select blood type</option>
+                            <% bloodTypes.forEach(type => { %>
+                                <option value="<%= type %>"><%= type %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="units">Units *</label>
+                        <input type="number" class="form-control" id="units" name="units" min="1" value="1" required>
+                        <small class="form-text text-muted">1 unit = 450-500 ml of whole blood</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select class="form-control" id="status" name="status" required>
+                            <option value="available" selected>Available</option>
+                            <option value="reserved">Reserved</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donation_date">Donation Date *</label>
+                        <input type="date" class="form-control" id="donation_date" name="donation_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="expiry_date">Expiry Date *</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="donor_id">Donor (Optional)</label>
+                        <select class="form-control" id="donor_id" name="donor_id">
+                            <option value="">-- External Source --</option>
+                            <% donors.forEach(donor => { %>
+                                <option value="<%= donor.donor_id %>"><%= donor.name %> (ID: <%= donor.donor_id %>)</option>
+                            <% }); %>
+                        </select>
+                        <small class="form-text text-muted">Leave blank if received from an external source.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Inventory</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Inventory Modal -->
+<div class="modal fade" id="editInventoryModal" tabindex="-1" role="dialog" aria-labelledby="editInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editInventoryModalLabel">Edit Blood Inventory</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editInventoryForm" action="/admin/inventory/0" method="POST">
+                <input type="hidden" name="_method" value="PUT">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="edit_blood_type">Blood Type *</label>
+                        <select class="form-control" id="edit_blood_type" name="blood_type" required>
+                            <% bloodTypes.forEach(type => { %>
+                                <option value="<%= type %>"><%= type %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_units">Units *</label>
+                        <input type="number" class="form-control" id="edit_units" name="units" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_status">Status *</label>
+                        <select class="form-control" id="edit_status" name="status" required>
+                            <option value="available">Available</option>
+                            <option value="reserved">Reserved</option>
+                            <option value="used">Used</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_expiry_date">Expiry Date *</label>
+                        <input type="date" class="form-control" id="edit_expiry_date" name="expiry_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_notes">Notes</label>
+                        <textarea class="form-control" id="edit_notes" name="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Inventory Modal -->
+<div class="modal fade" id="deleteInventoryModal" tabindex="-1" role="dialog" aria-labelledby="deleteInventoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteInventoryModalLabel">Confirm Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the following inventory item?</p>
+                <p id="deleteInventoryInfo"></p>
+                <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form id="deleteInventoryForm" action="/admin/inventory/0" method="POST">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+    
+    // Initialize DataTable
+    $('#inventoryTable').DataTable({
+        paging: false,
+        searching: false,
+        info: false
+    });
+    
+    // Set default dates
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('donation_date').value = today;
+    
+    // Calculate default expiry date (42 days from today)
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 42);
+    document.getElementById('expiry_date').value = expiryDate.toISOString().split('T')[0];
+    
+    // Edit inventory modal
+    $('#editInventoryModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+        const bloodType = button.data('blood-type');
+        const units = button.data('units');
+        const status = button.data('status');
+        const expiryDate = button.data('expiry-date');
+        
+        const form = $('#editInventoryForm');
+        form.attr('action', `/admin/inventory/${id}?_method=PUT`);
+        
+        $('#edit_blood_type').val(bloodType);
+        $('#edit_units').val(units);
+        $('#edit_status').val(status);
+        $('#edit_expiry_date').val(expiryDate);
+    });
+    
+    // Delete inventory modal
+    $('#deleteInventoryModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+        const bloodType = button.data('blood-type');
+        const units = button.data('units');
+        
+        $('#deleteInventoryInfo').html(`<strong>ID:</strong> ${id}<br><strong>Blood Type:</strong> ${bloodType}<br><strong>Units:</strong> ${units}`);
+        $('#deleteInventoryForm').attr('action', `/admin/inventory/${id}?_method=DELETE`);
+    });
+});
+</script> 

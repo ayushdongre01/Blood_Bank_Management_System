@@ -1,0 +1,401 @@
+<%- layout('layouts/boilerplate') %>
+
+<div class="container my-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">New Blood Request</h2>
+        </div>
+        <div class="card-body">
+            <% if(locals.error) { %>
+                <div class="alert alert-danger">
+                    <%= error %>
+                </div>
+            <% } %>
+            
+            <form action="/bloodrequests" method="POST" id="bloodRequestForm" class="needs-validation" novalidate>
+                <div class="mb-4">
+                    <h4>Hospital Information</h4>
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <% if (hospital) { %>
+                                <input type="hidden" name="hospital_id" value="<%= hospital.hospital_id %>">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Hospital Name:</strong> <%= hospital.hospital_name %></p>
+                                        <% if (hospital.contact_no) { %>
+                                            <p><strong>Contact:</strong> <%= hospital.contact_no %></p>
+                                        <% } %>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Address:</strong> <%= hospital.hospital_address %></p>
+                                        <% if (hospital.email) { %>
+                                            <p><strong>Email:</strong> <%= hospital.email %></p>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            <% } else { %>
+                                <div class="alert alert-warning">
+                                    Hospital information is not available. Please complete your hospital profile.
+                                </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4>Recipient Information</h4>
+                    <div class="mb-3">
+                        <label for="recipient_id" class="form-label">Select Recipient</label>
+                        <select class="form-select" id="recipient_id" name="recipient_id">
+                            <option value="">-- No specific recipient (general request) --</option>
+                            <% if (recipients && recipients.length > 0) { %>
+                                <% recipients.forEach(recipient => { %>
+                                    <option value="<%= recipient.recipient_id %>" data-blood-type="<%= recipient.blood_type %>">
+                                        <%= recipient.name %> - <%= recipient.blood_type %> 
+                                        (<%= recipient.gender %>, <%= new Date(recipient.date_of_birth).toLocaleDateString() %>)
+                                    </option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a recipient or create a new one.
+                        </div>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="new_recipient_toggle" name="new_recipient_toggle">
+                        <label class="form-check-label" for="new_recipient_toggle">
+                            Add New Recipient
+                        </label>
+                    </div>
+                    
+                    <div id="new_recipient_section" style="display: none;">
+                        <!-- This section will be shown when creating a new recipient -->
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-info text-white">
+                                New Recipient Details
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="name" class="form-label">Recipient Name <span class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="name" name="recipient[name]">
+                                            <div class="invalid-feedback">
+                                                Please enter the recipient's name.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="gender" name="recipient[gender]">
+                                                <option value="">-- Select gender --</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select the recipient's gender.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="date_of_birth" class="form-label">Date of Birth <span class="text-danger">*</span></label>
+                                            <input type="date" class="form-control" id="date_of_birth" name="recipient[date_of_birth]">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid date of birth.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="blood_type_recipient" class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="blood_type_recipient" name="recipient[blood_type]">
+                                                <option value="">-- Select blood type --</option>
+                                                <option value="A+">A+</option>
+                                                <option value="A-">A-</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B-">B-</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="AB-">AB-</option>
+                                                <option value="O+">O+</option>
+                                                <option value="O-">O-</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select the recipient's blood type.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="address" name="recipient[address]" rows="2"></textarea>
+                                    <div class="invalid-feedback">
+                                        Please enter the recipient's address.
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="contact_no" class="form-label">Contact Number <span class="text-danger">*</span></label>
+                                            <input type="tel" class="form-control" id="contact_no" name="recipient[contact_no]">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid contact number.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="recipient[email]">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid email address.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="receiver_type" class="form-label">Receiver Type <span class="text-danger">*</span></label>
+                                            <select class="form-select" id="receiver_type" name="recipient[receiver_type]">
+                                                <option value="">-- Select receiver type --</option>
+                                                <option value="Surgery">Surgery Patient</option>
+                                                <option value="Accident">Accident/Trauma Patient</option>
+                                                <option value="Cancer">Cancer Patient</option>
+                                                <option value="Anemia">Anemia Patient</option>
+                                                <option value="Pregnancy">Pregnancy Complication</option>
+                                                <option value="Regular">Regular Transfusion</option>
+                                                <option value="Emergency">Emergency</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <div class="invalid-feedback">
+                                                Please select the recipient type.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="hospital_id_recipient" class="form-label">Associated Hospital <span class="text-danger">*</span></label>
+                                            <input type="hidden" id="hospital_id_recipient" name="recipient[hospital_id]" value="<%= hospital ? hospital.hospital_id : '' %>">
+                                            <input type="text" class="form-control" value="<%= hospital ? hospital.hospital_name : 'Current Hospital' %>" readonly>
+                                            <div class="form-text">The recipient will be associated with this hospital</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Additional medical details -->
+                                <div class="mb-3">
+                                    <label for="medical_history" class="form-label">Medical History</label>
+                                    <textarea class="form-control" id="medical_history" name="recipient[medical_history]" rows="2" placeholder="Any relevant medical history..."></textarea>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="save_recipient" name="save_recipient" checked>
+                                    <label class="form-check-label" for="save_recipient">
+                                        Save recipient to database for future requests
+                                    </label>
+                                    <div class="form-text">This will store the recipient in the database for future blood requests</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4>Blood Requirements</h4>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="blood_type" class="form-label">Blood Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="blood_type" name="blood_type" required>
+                                    <option value="">-- Select Blood Type --</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a blood type.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="component" class="form-label">Blood Component <span class="text-danger">*</span></label>
+                                <select class="form-select" id="component" name="component" required>
+                                    <option value="Whole Blood">Whole Blood</option>
+                                    <option value="Red Blood Cells">Red Blood Cells</option>
+                                    <option value="Plasma">Plasma</option>
+                                    <option value="Platelets">Platelets</option>
+                                    <option value="Cryoprecipitate">Cryoprecipitate</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a blood component.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="quantity_ml" class="form-label">Amount Required (ml) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity_ml" name="quantity_ml" min="450" max="10000" value="450" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid amount (minimum 450ml).
+                                </div>
+                                <small class="form-text text-muted">Standard unit is 450-500 ml of whole blood</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="required_date" class="form-label">Required By Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="required_date" name="required_date" required>
+                                <div class="invalid-feedback">
+                                    Please specify a valid date when the blood is required.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="priority" class="form-label">Priority Level <span class="text-danger">*</span></label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="" disabled selected>Select priority level</option>
+                                    <option value="Emergency">Emergency - Immediate (within hours)</option>
+                                    <option value="Urgent">Urgent - Within 24 hours</option>
+                                    <option value="High">High - Within 48 hours</option>
+                                    <option value="Regular">Regular - Within a week</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a priority level.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4>Additional Information</h4>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Enter any additional details about this request..."></textarea>
+                    </div>
+                    
+                    <!-- Request Status -->
+                    <input type="hidden" name="request_status" value="pending">
+                </div>
+
+                <div class="d-flex justify-content-end">
+                    <a href="/bloodrequests" class="btn btn-secondary me-2">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default required date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const requiredDateField = document.getElementById('required_date');
+        requiredDateField.min = tomorrow.toISOString().split('T')[0];
+        requiredDateField.value = tomorrow.toISOString().split('T')[0];
+        
+        // Set max date for date of birth (limit to people at least 1 day old)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date_of_birth').setAttribute('max', today);
+        
+        // Toggle new recipient section visibility
+        document.getElementById('new_recipient_toggle').addEventListener('change', function() {
+            const newRecipientSection = document.getElementById('new_recipient_section');
+            const recipientSelect = document.getElementById('recipient_id');
+            
+            if(this.checked) {
+                newRecipientSection.style.display = 'block';
+                recipientSelect.disabled = true;
+            } else {
+                newRecipientSection.style.display = 'none';
+                recipientSelect.disabled = false;
+            }
+        });
+        
+        // Auto-fill blood type when recipient is selected
+        const recipientSelect = document.getElementById('recipient_id');
+        const bloodTypeSelect = document.getElementById('blood_type');
+        
+        recipientSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const bloodType = selectedOption.getAttribute('data-blood-type');
+            
+            if (bloodType) {
+                for (let i = 0; i < bloodTypeSelect.options.length; i++) {
+                    if (bloodTypeSelect.options[i].value === bloodType) {
+                        bloodTypeSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        });
+        
+        // Copy selected blood type to recipient form
+        bloodTypeSelect.addEventListener('change', function() {
+            if (document.getElementById('new_recipient_toggle').checked) {
+                document.getElementById('blood_type_recipient').value = this.value;
+            }
+        });
+        
+        // Form validation
+        const form = document.getElementById('bloodRequestForm');
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            // Check if adding new recipient but fields are not filled
+            if (document.getElementById('new_recipient_toggle').checked) {
+                const requiredFields = [
+                    document.getElementById('name'),
+                    document.getElementById('gender'),
+                    document.getElementById('date_of_birth'),
+                    document.getElementById('blood_type_recipient'),
+                    document.getElementById('address'),
+                    document.getElementById('contact_no'),
+                    document.getElementById('receiver_type')
+                ];
+                
+                let isValid = true;
+                requiredFields.forEach(function(field) {
+                    if (!field.value) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+                
+                if (!isValid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            }
+            
+            form.classList.add('was-validated');
+        });
+    });
+</script> 

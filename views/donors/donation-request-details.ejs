@@ -1,0 +1,207 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/donors/profile/dashboard" class="text-dark" style="text-decoration: none;">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/donors/donation/requests" class="text-dark" style="text-decoration: none;">Donation Requests</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Request</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-file-medical"></i> Donation Request Details</h1>
+        </div>
+        <div class="col-auto">
+            <% if (request.status === 'pending') { %>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                    <i class="fas fa-times-circle me-2"></i> Cancel Request
+                </button>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Request Information</h5>
+                </div>
+                <div class="card-body">
+                    <!-- <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Request ID:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <%= request.donation_id %>
+                        </div>
+                    </div> -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Date Requested:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <%= new Date(request.donation_date).toLocaleDateString() %>
+                        </div>
+                    </div>
+                    <% if (request.appointment_date) { %>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Appointment Date:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <%= new Date(request.appointment_date).toLocaleDateString() %>
+                            </div>
+                        </div>
+                    <% } %>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>Status:</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge <%= 
+                                request.status === 'pending' ? 'bg-warning' : 
+                                request.status === 'approved' ? 'bg-success' : 
+                                request.status === 'completed' ? 'bg-primary' : 
+                                request.status === 'rejected' ? 'bg-danger' :
+                                'bg-secondary' 
+                            %>">
+                                <%= request.status.charAt(0).toUpperCase() + request.status.slice(1) %>
+                            </span>
+                        </div>
+                    </div>
+                    <% if (request.campaign_id) { %>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Campaign:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <%= request.campaign_name || 'Campaign #' + request.campaign_id %>
+                            </div>
+                        </div>
+                    <% } %>
+                    <% if (request.notes) { %>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <strong>Notes:</strong>
+                            </div>
+                            <div class="col-md-8">
+                                <p style="white-space: pre-line;"><%= request.notes %></p>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <% if (request.status === 'approved') { %>
+                <div class="card shadow-sm mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i> Your Donation is Approved</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Your donation request has been approved. Please arrive at the donation center on the scheduled appointment date.</p>
+                        <p><strong>Preparation Tips:</strong></p>
+                        <ul>
+                            <li>Get a good night's sleep before your donation</li>
+                            <li>Eat a healthy meal before donating</li>
+                            <li>Drink plenty of water</li>
+                            <li>Bring a valid ID</li>
+                            <li>Avoid caffeine and alcohol 24 hours before donation</li>
+                        </ul>
+                    </div>
+                </div>
+            <% } else if (request.status === 'rejected') { %>
+                <div class="card shadow-sm mb-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-times-circle me-2"></i> Your Donation Request was Rejected</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>We're sorry, but your donation request has been rejected. Please review the notes for more information.</p>
+                        <p>You can create a new donation request when the issues are resolved.</p>
+                    </div>
+                </div>
+            <% } else if (request.status === 'completed') { %>
+                <div class="card shadow-sm mb-4 border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i> Donation Completed</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Thank you for your donation! Your contribution will help save lives.</p>
+                        <% if (request.status === 'completed') { %>
+                            <a href="/donors/certificate/<%= request.donation_id %>" class="btn btn-outline-primary">
+                                <i class="fas fa-certificate me-2"></i> View Certificate
+                            </a>
+                            <a href="/donors/certificate/<%= request.donation_id %>/print" class="btn btn-outline-danger">
+                                <i class="fas fa-print me-2"></i> Print Certificate
+                            </a>
+                        <% } else { %>
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i> Donation certificates will be available once your donation is marked as completed.
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> What Happens Next?</h5>
+                </div>
+                <div class="card-body">
+                    <% if (request.status === 'pending') { %>
+                        <p>Your request is currently being reviewed. You will be notified once it's approved.</p>
+                        <p>During this time:</p>
+                        <ul>
+                            <li>Stay hydrated</li>
+                            <li>Maintain a healthy diet</li>
+                            <li>Avoid new medications if possible</li>
+                        </ul>
+                    <% } else if (request.status === 'approved') { %>
+                        <p>Your request has been approved. Please arrive at the donation center on the scheduled date.</p>
+                        <p>Remember to bring:</p>
+                        <ul>
+                            <li>A valid ID</li>
+                            <li>List of current medications</li>
+                            <li>Information about recent travel</li>
+                        </ul>
+                    <% } else if (request.status === 'completed') { %>
+                        <p>Your donation has been completed. Thank you for your contribution!</p>
+                        <p>Remember to:</p>
+                        <ul>
+                            <li>Rest for the remainder of the day</li>
+                            <li>Drink plenty of fluids</li>
+                            <li>Avoid strenuous activities for 24 hours</li>
+                            <li>You can donate again after 3 months</li>
+                        </ul>
+                    <% } else if (request.status === 'rejected') { %>
+                        <p>Your request was rejected. You can submit a new request after addressing the reasons for rejection.</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/donors/donation/request/<%= request.donation_id %>/cancel" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cancel Donation Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to cancel this donation request?</p>
+                    <p class="text-muted">This action cannot be undone. You will need to create a new request if you want to donate in the future.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, keep it</button>
+                    <button type="submit" class="btn btn-danger">Yes, cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 

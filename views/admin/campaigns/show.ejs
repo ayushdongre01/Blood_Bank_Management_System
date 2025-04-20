@@ -1,0 +1,355 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/campaigns">Campaigns</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><%= campaign.name %></li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group">
+                <a href="/admin/campaigns/<%= campaign.campaign_id %>/edit" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <% 
+                    const today = new Date();
+                    const startDate = new Date(campaign.start_date);
+                    const endDate = new Date(campaign.end_date);
+                    let status;
+                    
+                    if (today < startDate) {
+                        status = "upcoming";
+                    } else if (today <= endDate) {
+                        status = "active";
+                    } else {
+                        status = "completed";
+                    }
+                %>
+                <% if (status === "completed") { %>
+                    <a href="/admin/campaigns/reports/<%= campaign.campaign_id %>" class="btn btn-info">
+                        <i class="fas fa-chart-bar"></i> View Report
+                    </a>
+                <% } %>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteCampaignModal">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="card-title"><%= campaign.name %></h1>
+                    
+                    <div class="mb-3">
+                        <span class="badge 
+                            <%= status === 'upcoming' ? 'bg-primary' : 
+                               status === 'active' ? 'bg-success' : 
+                               'bg-secondary' %>">
+                            <%= status.charAt(0).toUpperCase() + status.slice(1) %>
+                        </span>
+                        <% if (campaign.isPublished) { %>
+                            <span class="badge bg-success">Published</span>
+                        <% } else { %>
+                            <span class="badge bg-warning text-dark">Unpublished</span>
+                        <% } %>
+                    </div>
+                    
+                    <% if (campaign.image_url) { %>
+                        <div class="mb-4">
+                            <img src="<%= campaign.image_url %>" alt="<%= campaign.name %>" class="img-fluid rounded" style="max-height: 300px; width: auto;">
+                        </div>
+                    <% } %>
+                    
+                    <h5 class="text-muted">Description</h5>
+                    <p class="mb-4"><%= campaign.description %></p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Campaign Details</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span><i class="fas fa-map-marker-alt text-danger"></i> Location</span>
+                                    <strong><%= campaign.location %></strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span><i class="fas fa-calendar-alt text-primary"></i> Start Date</span>
+                                    <strong><%= new Date(campaign.start_date).toLocaleDateString() %></strong>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span><i class="fas fa-calendar-check text-success"></i> End Date</span>
+                                    <strong><%= new Date(campaign.end_date).toLocaleDateString() %></strong>
+                                </li>
+                                <% if (campaign.organizer) { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span><i class="fas fa-user-tie text-info"></i> Organizer</span>
+                                        <strong><%= campaign.organizer %></strong>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Contact Information</h5>
+                            <ul class="list-group list-group-flush">
+                                <% if (campaign.contactEmail) { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span><i class="fas fa-envelope text-primary"></i> Email</span>
+                                        <strong><%= campaign.contactEmail %></strong>
+                                    </li>
+                                <% } %>
+                                <% if (campaign.contactPhone) { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span><i class="fas fa-phone text-success"></i> Phone</span>
+                                        <strong><%= campaign.contactPhone %></strong>
+                                    </li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <% if (campaign.eligibilityCriteria) { %>
+                        <h5 class="text-muted mt-4">Eligibility Criteria</h5>
+                        <p><%= campaign.eligibilityCriteria %></p>
+                    <% } %>
+                    
+                    <% if (campaign.incentives) { %>
+                        <h5 class="text-muted mt-4">Incentives</h5>
+                        <p><%= campaign.incentives %></p>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Registered Donors -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Registered Donors</h5>
+                </div>
+                <div class="card-body">
+                    <% if (registeredDonors && registeredDonors.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="donorsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Donor Name</th>
+                                        <th>Blood Type</th>
+                                        <th>Registration Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% registeredDonors.forEach(donor => { %>
+                                        <tr>
+                                            <td><%= donor.name %></td>
+                                            <td><span class="badge bg-danger"><%= donor.blood_type %></span></td>
+                                            <td><%= new Date(donor.registration_date).toLocaleDateString() %></td>
+                                            <td>
+                                                <% if (donor.donation_status === 'completed') { %>
+                                                    <span class="badge bg-success">Donated</span>
+                                                <% } else if (donor.donation_status === 'scheduled') { %>
+                                                    <span class="badge bg-primary">Scheduled</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-warning text-dark">Registered</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/donors/<%= donor.donor_id %>" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No donors registered for this campaign yet.
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Campaign Statistics -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Campaign Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="mb-0"><%= campaign.donor_count || 0 %></h5>
+                                    <p class="small mb-0">Registered Donors</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="mb-0"><%= campaign.donation_count || 0 %></h5>
+                                    <p class="small mb-0">Donations Completed</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <% if (campaign.targetDonors) { %>
+                        <div class="progress mb-3" style="height: 25px;">
+                            <% 
+                                const percentage = Math.round((campaign.donor_count || 0) / campaign.targetDonors * 100);
+                                let progressClass = "bg-success";
+                                if (percentage < 25) progressClass = "bg-danger";
+                                else if (percentage < 50) progressClass = "bg-warning";
+                                else if (percentage < 75) progressClass = "bg-info";
+                            %>
+                            <div class="progress-bar <%= progressClass %>" role="progressbar" 
+                                 style="width: <%= percentage %>%;" 
+                                 aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+                                <%= percentage %>%
+                            </div>
+                        </div>
+                        <p class="text-center small mb-0">
+                            <strong><%= campaign.donor_count || 0 %></strong> of <strong><%= campaign.targetDonors %></strong> target donors
+                        </p>
+                    <% } %>
+                    
+                    <% if (bloodTypeData && bloodTypeData.length > 0) { %>
+                        <h6 class="mt-4 mb-3">Blood Types Collected</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Blood Type</th>
+                                        <th class="text-end">Units</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% bloodTypeData.forEach(item => { %>
+                                        <tr>
+                                            <td><span class="badge bg-danger"><%= item.blood_type %></span></td>
+                                            <td class="text-end"><%= item.units %></td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <% if (!campaign.isPublished) { %>
+                            <form action="/admin/campaigns/<%= campaign.campaign_id %>/publish" method="POST">
+                                <button type="submit" class="btn btn-success btn-block">
+                                    <i class="fas fa-globe"></i> Publish Campaign
+                                </button>
+                            </form>
+                        <% } else { %>
+                            <form action="/admin/campaigns/<%= campaign.campaign_id %>/unpublish" method="POST">
+                                <button type="submit" class="btn btn-warning btn-block">
+                                    <i class="fas fa-eye-slash"></i> Unpublish Campaign
+                                </button>
+                            </form>
+                        <% } %>
+                        
+                        <a href="/admin/donations/add?campaign=<%= campaign.campaign_id %>" class="btn btn-primary btn-block">
+                            <i class="fas fa-plus-circle"></i> Add Donation
+                        </a>
+                        
+                        <% if (status !== "completed") { %>
+                            <a href="/admin/campaigns/<%= campaign.campaign_id %>/donors/invite" class="btn btn-info btn-block">
+                                <i class="fas fa-envelope"></i> Invite Donors
+                            </a>
+                        <% } %>
+                        
+                        <% if (status === "completed") { %>
+                            <a href="/admin/campaigns/reports/<%= campaign.campaign_id %>" class="btn btn-success btn-block">
+                                <i class="fas fa-chart-bar"></i> Generate Report
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Info -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">System Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small mb-1">
+                        <strong>Campaign ID:</strong> <%= campaign.campaign_id %>
+                    </p>
+                    <p class="small mb-1">
+                        <strong>Created:</strong> <%= new Date(campaign.created_at).toLocaleString() %>
+                    </p>
+                    <p class="small">
+                        <strong>Last Updated:</strong> <%= new Date(campaign.updated_at).toLocaleString() %>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Campaign Modal -->
+<div class="modal fade" id="deleteCampaignModal" tabindex="-1" role="dialog" aria-labelledby="deleteCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteCampaignModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong><%= campaign.name %></strong>?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-circle"></i> This action cannot be undone. All associated data will be permanently deleted.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form action="/admin/campaigns/<%= campaign.campaign_id %>?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete Campaign</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Initialize donor table
+        $('#donorsTable').DataTable({
+            responsive: true,
+            order: [[2, 'desc']], // Sort by registration date descending
+            paginate: true,
+            pageLength: 10,
+            language: {
+                search: "Search donors:",
+                paginate: {
+                    first: "First",
+                    last: "Last",
+                    next: "Next",
+                    previous: "Previous"
+                }
+            }
+        });
+    });
+</script> 

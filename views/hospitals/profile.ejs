@@ -1,0 +1,208 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+    <div class="row">
+        <!-- Hospital Profile Information -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <% if (hospital.profile_image) { %>
+                        <img src="<%= hospital.profile_image %>" alt="<%= hospital.hospital_name %>" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    <% } else { %>
+                        <img src="/images/default-hospital.png" alt="Default Hospital Image" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    <% } %>
+                    
+                    <h3 class="text-primary"><%= hospital.hospital_name %></h3>
+                    <p class="text-muted">
+                        <i class="fas fa-hospital-alt"></i> <%= hospital.hospital_type || 'Hospital' %>
+                    </p>
+                    
+                    <div class="d-flex justify-content-center mb-2">
+                        <% if (currentUser && currentUser.user_id === hospital.user_id) { %>
+                            <a href="/hospitals/profile/edit" class="btn btn-primary">Edit Profile</a>
+                            <a href="/hospitals/profile/dashboard" class="btn btn-outline-primary ms-2">Dashboard</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">Contact Information</h5>
+                    <div class="mb-3">
+                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                        <span><%= hospital.hospital_address || 'Address not provided' %>, <%= hospital.city || '' %>, <%= hospital.state || '' %> <%= hospital.pin_code || '' %></span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-phone text-primary me-2"></i>
+                        <span><%= hospital.contact_no || 'Contact number not provided' %></span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-envelope text-primary me-2"></i>
+                        <span><%= hospital.email || 'Email not provided' %></span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="fas fa-globe text-primary me-2"></i>
+                        <span><%= hospital.website || 'Website not provided' %></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="col-lg-8">
+            <!-- Hospital Description -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">About Hospital</h5>
+                    <p><%= hospital.description || 'No description provided.' %></p>
+                </div>
+            </div>
+            
+            <!-- Blood Inventory -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">Blood Inventory Status</h5>
+                    <div class="row">
+                        <% const bloodGroups = Object.keys(bloodInventory); %>
+                        <% bloodGroups.forEach(group => { %>
+                            <div class="col-md-3 col-sm-6 mb-3">
+                                <div class="card h-100 <%= bloodInventory[group].available < bloodInventory[group].needed ? 'border-danger' : 'border-success' %>">
+                                    <div class="card-body text-center p-2">
+                                        <h5 class="card-title mb-0"><%= group %></h5>
+                                        <p class="mb-0"><%= bloodInventory[group].available %> units</p>
+                                        <% if (bloodInventory[group].available < bloodInventory[group].needed) { %>
+                                            <small class="text-danger">
+                                                Need <%= bloodInventory[group].needed - bloodInventory[group].available %> more
+                                            </small>
+                                        <% } else { %>
+                                            <small class="text-success">Sufficient</small>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">Quick Actions</h5>
+                    <div class="row">
+                        <!-- Request Blood -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-tint fa-3x text-danger mb-3"></i>
+                                    <h5>Request Blood</h5>
+                                    <p class="text-muted small">Submit requests for needed blood types</p>
+                                    <a href="/hospitals/request/new" class="btn btn-outline-danger stretched-link">Request Blood</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Organize Campaign -->
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
+                                    <h5>Organize Campaign</h5>
+                                    <p class="text-muted small">Schedule a blood donation drive</p>
+                                    <a href="/campaigns/new" class="btn btn-outline-primary stretched-link">Create Campaign</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Requests -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">
+                        Recent Blood Requests
+                        <a href="/hospitals/requests" class="btn btn-sm btn-outline-primary float-end">View All</a>
+                    </h5>
+                    
+                    <% if (recentRequests && recentRequests.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Blood Type</th>
+                                        <th>Units</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% recentRequests.forEach(request => { %>
+                                        <tr>
+                                            <td><%= request.request_date %></td>
+                                            <td><%= request.blood_type %></td>
+                                            <td><%= request.units_required %></td>
+                                            <td>
+                                                <span class="badge rounded-pill bg-<%= 
+                                                    request.status === 'fulfilled' ? 'success' : 
+                                                    request.status === 'pending' ? 'warning' : 
+                                                    request.status === 'urgent' ? 'danger' : 'secondary' 
+                                                %>">
+                                                    <%= request.status %>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-4">
+                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                            <p>No recent blood requests found.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+            
+            <!-- Active Campaigns -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2">
+                        Active Campaigns
+                        <a href="/campaigns" class="btn btn-sm btn-outline-primary float-end">View All</a>
+                    </h5>
+                    
+                    <% if (activeCampaigns && activeCampaigns.length > 0) { %>
+                        <div class="row">
+                            <% activeCampaigns.forEach(campaign => { %>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><%= campaign.title %></h5>
+                                            <p class="text-muted">
+                                                <i class="far fa-calendar-alt"></i> <%= campaign.campaign_date %>
+                                                <br>
+                                                <i class="fas fa-map-marker-alt"></i> <%= campaign.location %>
+                                            </p>
+                                            <a href="/campaigns/<%= campaign.id %>" class="btn btn-sm btn-outline-primary">View Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <p>No active campaigns found.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %> 
