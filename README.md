@@ -2,7 +2,7 @@
 
 A comprehensive blood bank management system built with Node.js, Express, and MySQL. This application streamlines the entire blood donation ecosystem, connecting donors, recipients, hospitals, and blood bank staff on a single platform.
 
-![Blood Bank Management System](./screenshots/dashboard.png)
+
 
 ## ✨ Features
 
@@ -14,8 +14,8 @@ A comprehensive blood bank management system built with Node.js, Express, and My
 - **👤 Donor Management**
   - Registration and profile management
   - Donation history tracking
-  - Eligibility screening and appointment scheduling
-  - Donation certificates and rewards
+  - Appointment scheduling
+  - Donation certificates 
 
 - **🏥 Hospital Portal**
   - Hospital registration and verification
@@ -24,33 +24,14 @@ A comprehensive blood bank management system built with Node.js, Express, and My
   - Real-time inventory access
 
 - **📦 Blood Inventory Management**
-  - Blood unit tracking by type, component, and expiration
-  - Automatic alerts for low inventory levels
-  - Component separation tracking
-  - Cross-matching and compatibility checking
+  - Blood unit tracking by type
+  - Automatic update on donations or approving the blood requests
 
 - **🎯 Donation Campaigns**
   - Campaign planning and execution
   - Donor recruitment tools
-  - Location management and mapping
-  - Performance analytics
+  - Upcoming donations prior information and countdown
 
-- **💉 Transfusion Management**
-  - Recording and monitoring blood transfusions
-  - Patient outcome tracking
-  - Adverse reaction reporting
-  - Compatibility verification
-
-- **📊 Reporting & Analytics**
-  - Comprehensive dashboards for all user types
-  - Customizable reports for regulatory compliance
-  - Donation and inventory trend analysis
-  - Hospital usage statistics
-
-- **📱 Notification System**
-  - Email notifications for appointments, campaigns, and critical events
-  - In-app notification center
-  - SMS integration capability (configurable)
 
 ## 🛠️ Technology Stack
 
@@ -58,9 +39,7 @@ A comprehensive blood bank management system built with Node.js, Express, and My
 - **Database**: MySQL
 - **Frontend**: HTML5, CSS3, JavaScript, EJS templating
 - **Authentication**: Passport.js with session management
-- **Email**: Nodemailer
 - **UI Framework**: Bootstrap 5
-- **Charts**: Chart.js
 - **Form Validation**: Express Validator
 
 ## 📋 Prerequisites
