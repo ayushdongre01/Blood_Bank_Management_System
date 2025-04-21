@@ -95,9 +95,6 @@ The database consists of the following main tables:
 - Staff
 - Notifications
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
