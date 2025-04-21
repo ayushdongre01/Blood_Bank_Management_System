@@ -1,103 +1,221 @@
-# Blood Bank Management System
+# 🩸 Blood Bank Management System
 
-A comprehensive blood bank management system built with Node.js, Express, and MySQL. This application facilitates the management of blood donors, recipients, hospitals, blood inventory, donation campaigns, and transfusion records.
+A comprehensive blood bank management system built with Node.js, Express, and MySQL. This application streamlines the entire blood donation ecosystem, connecting donors, recipients, hospitals, and blood bank staff on a single platform.
 
-## Features
+![Blood Bank Management System](./screenshots/dashboard.png)
 
-- **User Authentication**: Secure login system for donors, hospitals, staff, and administrators
-- **Donor Management**: Registration, profile management, donation history tracking
-- **Hospital Management**: Registration, blood request management, recipient tracking
-- **Blood Inventory**: Tracking blood units by type, component, and expiration
-- **Donation Campaigns**: Organization and management of blood donation drives
-- **Transfusion Tracking**: Recording and monitoring blood transfusions
-- **Reporting System**: Generate comprehensive reports for various metrics
-- **Notification System**: Email notifications for critical events
+## ✨ Features
 
-## Technology Stack
+- **🔐 User Authentication & Authorization**
+  - Secure role-based access control
+  - Password hashing and protection
+  - Session management for different user types
+
+- **👤 Donor Management**
+  - Registration and profile management
+  - Donation history tracking
+  - Eligibility screening and appointment scheduling
+  - Donation certificates and rewards
+
+- **🏥 Hospital Portal**
+  - Hospital registration and verification
+  - Blood request management
+  - Recipient tracking and medical history
+  - Real-time inventory access
+
+- **📦 Blood Inventory Management**
+  - Blood unit tracking by type, component, and expiration
+  - Automatic alerts for low inventory levels
+  - Component separation tracking
+  - Cross-matching and compatibility checking
+
+- **🎯 Donation Campaigns**
+  - Campaign planning and execution
+  - Donor recruitment tools
+  - Location management and mapping
+  - Performance analytics
+
+- **💉 Transfusion Management**
+  - Recording and monitoring blood transfusions
+  - Patient outcome tracking
+  - Adverse reaction reporting
+  - Compatibility verification
+
+- **📊 Reporting & Analytics**
+  - Comprehensive dashboards for all user types
+  - Customizable reports for regulatory compliance
+  - Donation and inventory trend analysis
+  - Hospital usage statistics
+
+- **📱 Notification System**
+  - Email notifications for appointments, campaigns, and critical events
+  - In-app notification center
+  - SMS integration capability (configurable)
+
+## 🛠️ Technology Stack
 
 - **Backend**: Node.js with Express.js
 - **Database**: MySQL
-- **Frontend**: HTML, CSS, JavaScript, EJS templating
-- **Authentication**: Passport.js
+- **Frontend**: HTML5, CSS3, JavaScript, EJS templating
+- **Authentication**: Passport.js with session management
 - **Email**: Nodemailer
+- **UI Framework**: Bootstrap 5
+- **Charts**: Chart.js
+- **Form Validation**: Express Validator
 
-## Installation
+## 📋 Prerequisites
 
-1. Clone the repository
-   ```
+- Node.js (v14 or higher)
+- MySQL (v5.7 or higher)
+- npm or yarn
+
+## 🚀 Installation
+
+1. **Clone the repository**
+   ```bash
    git clone https://github.com/yourusername/blood-bank-management.git
    cd blood-bank-management
    ```
 
-2. Install dependencies
-   ```
+2. **Install dependencies**
+   ```bash
    npm install
    ```
 
-3. Configure environment variables
-   - Create a `.env` file in the root directory
-   - Add the following variables:
-     ```
-     # Database Configuration
-     DB_HOST=localhost
-     DB_USER=your_mysql_username
-     DB_PASSWORD=your_mysql_password
-     DB_NAME=bloodbank_db
-
-     # Session Configuration
-     SESSION_SECRET=your_session_secret_key
-
-     # Email Configuration (for notifications)
-     EMAIL_USERNAME=your_email@gmail.com
-     EMAIL_PASSWORD=your_email_password
-
-     # Port
-     PORT=3000
-     ```
-
-4. Initialize the database
+3. **Configure environment variables**
+   - Create a `.env` file in the root directory with the following:
    ```
+   # Database Configuration
+   DB_HOST=localhost
+   DB_USER=your_mysql_username
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=bloodbank_db
+
+   # Session Configuration
+   SESSION_SECRET=your_session_secret_key
+
+   # Email Configuration (for notifications)
+   EMAIL_USERNAME=your_email@gmail.com
+   EMAIL_PASSWORD=your_email_password
+   EMAIL_SERVICE=gmail
+
+   # Server Configuration
+   PORT=3000
+   NODE_ENV=development
+   ```
+
+4. **Initialize the database**
+   ```bash
    npm run init-db
    ```
 
-5. Start the development server
-   ```
+5. **Start the development server**
+   ```bash
    npm run dev
    ```
 
-6. Access the application at `http://localhost:3000`
+6. **Access the application**
+   - Navigate to `http://localhost:3000` in your web browser
 
-## Default Admin Credentials
+## 👥 Default User Credentials
 
-- **Username**: admin@bloodbank.com
-- **Password**: AdminBlood@2025
+| Role      | Username               | Password         |
+|-----------|------------------------|------------------|
+| Admin     | admin@bloodbank.com    | AdminBlood@2025  |
+| Staff     | staff@bloodbank.com    | StaffBlood@2025  |
+| Hospital  | hospital@example.com   | Hospital@2025    |
+| Donor     | donor@example.com      | DonorBlood@2025  |
 
-## User Roles
+## 📁 Project Structure
 
-1. **Admin**: Full access to all features
-2. **Staff**: Access to donation management, inventory, and blood requests
-3. **Donor**: Register, view donation history, request donation appointments
-4. **Hospital**: Register, request blood, manage recipients
+```
+blood-bank-management/
+├── config/              # Configuration files
+├── controllers/         # Route controllers
+├── middlewares/         # Custom middlewares
+├── models/              # Database models
+├── public/              # Static assets
+│   ├── css/             # Stylesheets
+│   ├── js/              # Client-side JavaScript
+│   └── images/          # Images and icons
+├── routes/              # Express routes
+├── utils/               # Utility functions
+├── views/               # EJS templates
+├── .env                 # Environment variables
+├── app.js               # Application entry point
+└── README.md            # Project documentation
+```
 
-## Database Structure
+## 💾 Database Structure
 
-The database consists of the following main tables:
-- Users (Authentication)
-- Donors
-- Hospitals
-- Recipients
-- Blood Inventory
-- Donations
-- Screenings
-- Blood Requests
-- Transfusions
-- Campaigns
-- Staff
-- Notifications
+The database comprises 17 interconnected tables to manage the entire blood donation ecosystem:
 
+- **Users** - Authentication and role management
+- **Donors** - Donor profiles and medical history
+- **Recipients** - Patient information and medical requirements
+- **Hospital** - Hospital registration and contact details
+- **Blood Inventory** - Blood unit tracking and status
+- **Donations** - Donation records and processing status
+- **Donation Screenings** - Health checks and eligibility tests
+- **Blood Requests** - Hospital blood requisitions
+- **Transfusions** - Transfusion records and outcomes
+- **Campaigns** - Blood drive management
+- **Staff** - Staff profiles and role assignments
+- **Notifications** - System alerts and messages
+- **Tests Screening** - Detailed testing results
 
-## Acknowledgments
+## 📸 Screenshots
 
-- Icons by [FontAwesome](https://fontawesome.com/)
-- Bootstrap for UI components
-- Charts by Chart.js 
+![Login Screen](./screenshots/login.png)
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+![Donor Registration](./screenshots/donor-registration.png)
+![Blood Inventory](./screenshots/inventory.png)
+![Hospital Portal](./screenshots/hospital-portal.png)
+
+## 🔍 API Documentation
+
+API documentation is available at `/api-docs` when running in development mode.
+
+## 🧪 Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run specific test suite
+npm test -- --grep "Donor API"
+```
+
+## 🚢 Deployment
+
+For production deployment:
+
+```bash
+# Build for production
+npm run build
+
+# Start production server
+npm start
+```
+
+## 👨‍💻 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👏 Acknowledgments
+
+- [FontAwesome](https://fontawesome.com/) for icons
+- [Bootstrap](https://getbootstrap.com/) for UI components
+- [Chart.js](https://www.chartjs.org/) for data visualization
+- [Nodemailer](https://nodemailer.com/) for email integration
+- [Express.js](https://expressjs.com/) for the web framework 
