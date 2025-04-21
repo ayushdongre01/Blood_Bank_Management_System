@@ -2,7 +2,7 @@
 
 A comprehensive blood bank management system built with Node.js, Express, and MySQL. This application streamlines the entire blood donation ecosystem, connecting donors, recipients, hospitals, and blood bank staff on a single platform.
 
-
+![image alt] ()
 
 ## ✨ Features
 
