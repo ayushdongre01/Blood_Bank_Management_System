@@ -52,7 +52,7 @@ A comprehensive blood bank management system built with Node.js, Express, and My
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/blood-bank-management.git
+   git clone https://github.com/yourusername/blood-bank-management.git](https://github.com/ayushdongre01/Blood_Bank_Management_System.git
    cd blood-bank-management
    ```
 
@@ -96,14 +96,6 @@ A comprehensive blood bank management system built with Node.js, Express, and My
 6. **Access the application**
    - Navigate to `http://localhost:3000` in your web browser
 
-## 👥 Default User Credentials
-
-| Role      | Username               | Password         |
-|-----------|------------------------|------------------|
-| Admin     | admin@bloodbank.com    | AdminBlood@2025  |
-| Staff     | staff@bloodbank.com    | StaffBlood@2025  |
-| Hospital  | hospital@example.com   | Hospital@2025    |
-| Donor     | donor@example.com      | DonorBlood@2025  |
 
 ## 📁 Project Structure
 
@@ -135,47 +127,10 @@ The database comprises 17 interconnected tables to manage the entire blood donat
 - **Hospital** - Hospital registration and contact details
 - **Blood Inventory** - Blood unit tracking and status
 - **Donations** - Donation records and processing status
-- **Donation Screenings** - Health checks and eligibility tests
 - **Blood Requests** - Hospital blood requisitions
-- **Transfusions** - Transfusion records and outcomes
 - **Campaigns** - Blood drive management
 - **Staff** - Staff profiles and role assignments
-- **Notifications** - System alerts and messages
-- **Tests Screening** - Detailed testing results
 
-## 📸 Screenshots
-
-![Login Screen](./screenshots/login.png)
-![Admin Dashboard](./screenshots/admin-dashboard.png)
-![Donor Registration](./screenshots/donor-registration.png)
-![Blood Inventory](./screenshots/inventory.png)
-![Hospital Portal](./screenshots/hospital-portal.png)
-
-## 🔍 API Documentation
-
-API documentation is available at `/api-docs` when running in development mode.
-
-## 🧪 Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run specific test suite
-npm test -- --grep "Donor API"
-```
-
-## 🚢 Deployment
-
-For production deployment:
-
-```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-```
 
 ## 👨‍💻 Contributing
 
@@ -186,10 +141,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👏 Acknowledgments
 
