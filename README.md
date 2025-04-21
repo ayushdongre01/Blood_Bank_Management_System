@@ -146,6 +146,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - [FontAwesome](https://fontawesome.com/) for icons
 - [Bootstrap](https://getbootstrap.com/) for UI components
-- [Chart.js](https://www.chartjs.org/) for data visualization
-- [Nodemailer](https://nodemailer.com/) for email integration
 - [Express.js](https://expressjs.com/) for the web framework 
