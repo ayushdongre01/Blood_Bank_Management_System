@@ -131,6 +131,14 @@ The database comprises 17 interconnected tables to manage the entire blood donat
 - **Campaigns** - Blood drive management
 - **Staff** - Staff profiles and role assignments
 
+## 📸 Screenshots
+![image alt](https://github.com/ayushdongre01/Blood_Bank_Management_System/blob/main/screen5.png?raw=true)
+
+![image alt](https://github.com/ayushdongre01/Blood_Bank_Management_System/blob/main/screen2.png?raw=true)
+
+![image alt](https://github.com/ayushdongre01/Blood_Bank_Management_System/blob/main/screen3.png?raw=true)
+
+![image alt](https://github.com/ayushdongre01/Blood_Bank_Management_System/blob/main/screen4.png?raw=true)
 
 ## 👨‍💻 Contributing
 
